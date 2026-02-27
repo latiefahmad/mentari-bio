@@ -1,3 +1,39 @@
+/* ===== UPLOAD AREA ===== */
+.upload-area {
+  border: 2px dashed rgba(124,58,237,0.4);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-area:hover {
+  border-color: rgba(124,58,237,0.8);
+  background: rgba(124,58,237,0.05);
+}
+
+.upload-area i {
+  font-size: 2.5rem;
+  color: #a78bfa;
+}
+
+.upload-area p {
+  font-size: 0.9rem;
+  color: #e1e1f1;
+  font-weight: 500;
+}
+
+.upload-hint {
+  font-size: 0.75rem !important;
+  color: #8787a3 !important;
+  font-weight: 400 !important;
+}
+
 /* ===== RESET & BASE ===== */
 * {
   margin: 0;

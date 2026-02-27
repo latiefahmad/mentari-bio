@@ -1,116 +1,73 @@
 /**
  * =============================================
  * ADMIN PANEL – Rumah Belajar Mentari
- * Semua data disimpan di localStorage
+ * Semua data disimpan via API ke Supabase
  * =============================================
  */
 
-// ===== DEFAULT DATA =====
-const DEFAULT_DATA = {
-  credentials: { username: "admin", password: "mentari123" },
-  hero: {
-    name: "Rumah Belajar Mentari",
-    tagline: '"Mari membuat belajar lebih menyenangkan"',
-    tag: "Lembaga Bimbingan Belajar",
-    statStudents: "100+",
-    statYears: "5+",
-    statTeachers: "10+",
-  },
-  about: {
-    desc: "Rumah Belajar Mentari adalah lembaga bimbingan belajar yang berdedikasi untuk membantu siswa meraih prestasi terbaik mereka. Kami percaya bahwa setiap anak memiliki potensi luar biasa yang perlu dikembangkan dengan cara yang menyenangkan dan efektif.",
-    features: [
-      { icon: "ph-chalkboard-teacher", title: "Pengajar Berpengalaman", desc: "Tenaga pengajar profesional dan berpengalaman di bidangnya" },
-      { icon: "ph-smiley", title: "Belajar Menyenangkan", desc: "Metode pembelajaran interaktif yang membuat siswa semangat belajar" },
-      { icon: "ph-chart-line-up", title: "Hasil Terbukti", desc: "Ratusan siswa telah meningkatkan prestasi akademik mereka" },
-    ],
-  },
-  programs: [
-    {
-      level: "SD",
-      title: "Sekolah Dasar",
-      subtitle: "Kelas 1 – 6",
-      subjects: ["Matematika", "Bahasa Indonesia", "IPA & IPS", "Bahasa Inggris"],
-      featured: false,
-    },
-    {
-      level: "SMP",
-      title: "Sekolah Menengah Pertama",
-      subtitle: "Kelas 7 – 9",
-      subjects: ["Matematika", "IPA Terpadu", "Bahasa Inggris", "Persiapan UN"],
-      featured: true,
-    },
-    {
-      level: "SMA",
-      title: "Sekolah Menengah Atas",
-      subtitle: "Kelas 10 – 12",
-      subjects: ["Matematika & Fisika", "Kimia & Biologi", "Bahasa Inggris", "Persiapan SNBT"],
-      featured: false,
-    },
-  ],
-  schedule: [
-    { day: "Senin – Jumat", time: "14.00 – 17.00 WIB", desc: "Sesi Sore (Reguler)" },
-    { day: "Sabtu", time: "08.00 – 12.00 WIB", desc: "Sesi Pagi (Weekend)" },
-    { day: "Fleksibel", time: "Sesuai Kesepakatan", desc: "Privat / Online" },
-  ],
-  location: {
-    name: "Rumah Belajar Mentari",
-    address: "Jl. Contoh No. 123, Kota Anda",
-    note: "Hubungi kami untuk informasi lokasi lengkap",
-  },
-  links: {
-    wa: "6285733408212",
-    ig: "rb.mentari",
-    waMsg: "Halo Rumah Belajar Mentari! Saya ingin mendaftar sebagai siswa baru. Mohon informasi lebih lanjut 🙏",
-  },
-  gallery: [],
-  testimonials: [
-    {
-      text: '"Nilai matematika anak saya naik drastis setelah belajar di Rumah Belajar Mentari. Pengajarnya sabar dan metodenya mudah dipahami."',
-      name: "Ibu Ani",
-      role: "Orang tua siswa SD",
-      stars: 5,
-    },
-    {
-      text: '"Belajar di sini menyenangkan! Saya jadi lebih percaya diri menghadapi ujian. Terima kasih Rumah Belajar Mentari!"',
-      name: "Budi",
-      role: "Siswa SMP Kelas 9",
-      stars: 5,
-    },
-  ],
-  footer: {
-    name: "Rumah Belajar Mentari",
-    tagline: '"Mari membuat belajar lebih menyenangkan"',
-    copy: "Made with 💖 Rumah Belajar Mentari",
-  },
-};
-
-// ===== STORAGE HELPERS =====
-function getData(key) {
-  try {
-    const raw = localStorage.getItem("mentari_" + key);
-    return raw ? JSON.parse(raw) : DEFAULT_DATA[key];
-  } catch {
-    return DEFAULT_DATA[key];
-  }
-}
-
-function setData(key, value) {
-  localStorage.setItem("mentari_" + key, JSON.stringify(value));
-}
-
 // ===== AUTH =====
-function isLoggedIn() {
-  return sessionStorage.getItem("mentari_admin_logged_in") === "true";
+function getToken() {
+  return sessionStorage.getItem("mentari_admin_token");
 }
 
-function login(username, password) {
-  const creds = getData("credentials");
-  return username === creds.username && password === creds.password;
+function isLoggedIn() {
+  return !!getToken();
 }
 
 function logout() {
-  sessionStorage.removeItem("mentari_admin_logged_in");
+  sessionStorage.removeItem("mentari_admin_token");
   location.reload();
+}
+
+// ===== API HELPER =====
+async function apiGet(path) {
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`GET ${path} failed: ${res.status}`);
+  return res.json();
+}
+
+async function apiPut(path, data) {
+  const res = await fetch(path, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `PUT ${path} failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+async function apiPost(path, data) {
+  const res = await fetch(path, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `POST ${path} failed: ${res.status}`);
+  }
+  return res.json();
+}
+
+async function apiDelete(path) {
+  const res = await fetch(path, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${getToken()}` },
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `DELETE ${path} failed: ${res.status}`);
+  }
+  return res.json();
 }
 
 // ===== TOAST =====
@@ -147,18 +104,38 @@ function showAdminPage() {
 }
 
 // ===== LOGIN FORM =====
-document.getElementById("login-form").addEventListener("submit", (e) => {
+document.getElementById("login-form").addEventListener("submit", async (e) => {
   e.preventDefault();
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value;
   const errorEl = document.getElementById("login-error");
+  const submitBtn = e.target.querySelector("button[type=submit]");
 
-  if (login(username, password)) {
-    sessionStorage.setItem("mentari_admin_logged_in", "true");
-    errorEl.textContent = "";
+  errorEl.textContent = "";
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="ph-fill ph-spinner"></i> Masuk...';
+
+  try {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      errorEl.textContent = data.error || "Login gagal";
+      return;
+    }
+
+    sessionStorage.setItem("mentari_admin_token", data.token);
     showAdminPage();
-  } else {
-    errorEl.textContent = "Username atau password salah.";
+  } catch (err) {
+    errorEl.textContent = "Tidak dapat terhubung ke server";
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = '<i class="ph-fill ph-sign-in"></i> Masuk';
   }
 });
 
@@ -186,17 +163,12 @@ const pageTitle = document.getElementById("page-title");
 navItems.forEach((item) => {
   item.addEventListener("click", () => {
     const tab = item.dataset.tab;
-
     navItems.forEach((n) => n.classList.remove("active"));
     item.classList.add("active");
-
     tabContents.forEach((t) => t.classList.add("hidden"));
     const target = document.getElementById("tab-" + tab);
     if (target) target.classList.remove("hidden");
-
     pageTitle.textContent = item.textContent.trim();
-
-    // Close sidebar on mobile
     closeSidebar();
   });
 });
@@ -206,7 +178,6 @@ const menuToggle = document.getElementById("menu-toggle");
 const sidebar = document.getElementById("sidebar");
 const sidebarClose = document.getElementById("sidebar-close");
 
-// Create overlay
 const overlay = document.createElement("div");
 overlay.className = "sidebar-overlay";
 document.body.appendChild(overlay);
@@ -225,23 +196,29 @@ sidebarClose.addEventListener("click", closeSidebar);
 overlay.addEventListener("click", closeSidebar);
 
 // ===== INIT ADMIN PAGE =====
-function initAdminPage() {
-  loadHero();
-  loadAbout();
-  loadPrograms();
-  loadSchedule();
-  loadLocation();
-  loadLinks();
-  loadGallery();
-  loadTestimonials();
-  loadFooter();
+async function initAdminPage() {
+  try {
+    const data = await apiGet("/api/content");
+    const gallery = await apiGet("/api/gallery");
+
+    loadHero(data.hero || {});
+    loadAbout(data.about || {});
+    loadPrograms(data.programs || []);
+    loadSchedule(data.schedules || []);
+    loadLocation(data.location || {});
+    loadLinks(data.links || {});
+    loadGallery(gallery || []);
+    loadTestimonials(data.testimonials || []);
+    loadFooter(data.footer || {});
+  } catch (err) {
+    showToast("Gagal memuat data: " + err.message, "error");
+  }
 }
 
 // ===========================
 // ===== HERO =====
 // ===========================
-function loadHero() {
-  const d = getData("hero");
+function loadHero(d) {
   document.getElementById("hero-name").value = d.name || "";
   document.getElementById("hero-tagline").value = d.tagline || "";
   document.getElementById("hero-tag").value = d.tag || "";
@@ -250,33 +227,39 @@ function loadHero() {
   document.getElementById("stat-teachers").value = d.statTeachers || "";
 }
 
-function saveHero() {
-  setData("hero", {
-    name: document.getElementById("hero-name").value,
-    tagline: document.getElementById("hero-tagline").value,
-    tag: document.getElementById("hero-tag").value,
-    statStudents: document.getElementById("stat-students").value,
-    statYears: document.getElementById("stat-years").value,
-    statTeachers: document.getElementById("stat-teachers").value,
-  });
-  showToast("Hero berhasil disimpan!");
+async function saveHero() {
+  try {
+    await apiPut("/api/content/hero", {
+      name: document.getElementById("hero-name").value,
+      tagline: document.getElementById("hero-tagline").value,
+      tag: document.getElementById("hero-tag").value,
+      statStudents: document.getElementById("stat-students").value,
+      statYears: document.getElementById("stat-years").value,
+      statTeachers: document.getElementById("stat-teachers").value,
+    });
+    showToast("Hero berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== ABOUT =====
 // ===========================
-function loadAbout() {
-  const d = getData("about");
+let _aboutFeatures = [];
+
+function loadAbout(d) {
   document.getElementById("about-desc").value = d.desc || "";
-  renderAboutFeatures(d.features || []);
+  _aboutFeatures = d.features ? [...d.features] : [];
+  renderAboutFeatures();
 }
 
-function renderAboutFeatures(features) {
+function renderAboutFeatures() {
   const container = document.getElementById("about-features-list");
   container.innerHTML = "";
-  features.forEach((f, i) => {
+  _aboutFeatures.forEach((f, i) => {
     container.innerHTML += `
-      <div class="list-item" id="about-feature-${i}">
+      <div class="list-item">
         <div class="list-item-header">
           <span class="list-item-title">Fitur #${i + 1}</span>
           <button class="btn-danger" onclick="removeAboutFeature(${i})">
@@ -298,46 +281,53 @@ function renderAboutFeatures(features) {
 }
 
 function addAboutFeature() {
-  const d = getData("about");
-  const features = d.features || [];
-  features.push({ icon: "ph-star", title: "Fitur Baru", desc: "Deskripsi fitur" });
-  d.features = features;
-  setData("about", d);
-  renderAboutFeatures(features);
+  _aboutFeatures.push({ icon: "ph-star", title: "Fitur Baru", desc: "Deskripsi fitur" });
+  renderAboutFeatures();
 }
 
 function removeAboutFeature(index) {
-  const d = getData("about");
-  d.features.splice(index, 1);
-  setData("about", d);
-  renderAboutFeatures(d.features);
+  _aboutFeatures.splice(index, 1);
+  renderAboutFeatures();
 }
 
-function saveAbout() {
-  const d = getData("about");
-  d.desc = document.getElementById("about-desc").value;
-  const features = d.features || [];
-  features.forEach((f, i) => {
+async function saveAbout() {
+  // Baca nilai terkini dari form
+  _aboutFeatures.forEach((f, i) => {
     f.title = document.getElementById(`af-title-${i}`)?.value || f.title;
     f.desc = document.getElementById(`af-desc-${i}`)?.value || f.desc;
   });
-  d.features = features;
-  setData("about", d);
-  showToast("Tentang Kami berhasil disimpan!");
+
+  try {
+    await apiPut("/api/content/about", {
+      desc: document.getElementById("about-desc").value,
+      features: _aboutFeatures,
+    });
+    showToast("Tentang Kami berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== PROGRAMS =====
 // ===========================
-function loadPrograms() {
-  const programs = getData("programs");
-  renderPrograms(programs);
+let _programs = [];
+
+function loadPrograms(programs) {
+  _programs = programs.map(p => ({
+    level: p.level || "",
+    title: p.title || "",
+    subtitle: p.subtitle || "",
+    subjects: p.subjects || [],
+    is_featured: p.is_featured || false,
+  }));
+  renderPrograms();
 }
 
-function renderPrograms(programs) {
+function renderPrograms() {
   const container = document.getElementById("programs-list");
   container.innerHTML = "";
-  programs.forEach((p, i) => {
+  _programs.forEach((p, i) => {
     container.innerHTML += `
       <div class="list-item">
         <div class="list-item-header">
@@ -359,10 +349,9 @@ function renderPrograms(programs) {
             <label>Subtitle (misal: Kelas 1–6)</label>
             <input type="text" id="prog-sub-${i}" value="${escHtml(p.subtitle)}">
           </div>
-          <div class="form-group">
-            <label>
-              <input type="checkbox" id="prog-featured-${i}" ${p.featured ? "checked" : ""}> Tandai sebagai Populer
-            </label>
+          <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.5rem">
+            <input type="checkbox" id="prog-featured-${i}" ${p.is_featured ? "checked" : ""} style="width:auto">
+            <label for="prog-featured-${i}" style="margin:0">Tandai sebagai Populer</label>
           </div>
         </div>
         <div class="form-group">
@@ -374,45 +363,51 @@ function renderPrograms(programs) {
 }
 
 function addProgram() {
-  const programs = getData("programs");
-  programs.push({ level: "Baru", title: "Program Baru", subtitle: "Kelas ...", subjects: [], featured: false });
-  setData("programs", programs);
-  renderPrograms(programs);
+  _programs.push({ level: "Baru", title: "Program Baru", subtitle: "Kelas ...", subjects: [], is_featured: false });
+  renderPrograms();
 }
 
 function removeProgram(index) {
-  const programs = getData("programs");
-  programs.splice(index, 1);
-  setData("programs", programs);
-  renderPrograms(programs);
+  _programs.splice(index, 1);
+  renderPrograms();
 }
 
-function savePrograms() {
-  const programs = getData("programs");
-  programs.forEach((p, i) => {
+async function savePrograms() {
+  _programs.forEach((p, i) => {
     p.level = document.getElementById(`prog-level-${i}`)?.value || p.level;
     p.title = document.getElementById(`prog-title-${i}`)?.value || p.title;
     p.subtitle = document.getElementById(`prog-sub-${i}`)?.value || p.subtitle;
-    p.featured = document.getElementById(`prog-featured-${i}`)?.checked || false;
+    p.is_featured = document.getElementById(`prog-featured-${i}`)?.checked || false;
     const subjectsRaw = document.getElementById(`prog-subjects-${i}`)?.value || "";
-    p.subjects = subjectsRaw.split(",").map((s) => s.trim()).filter(Boolean);
+    p.subjects = subjectsRaw.split(",").map(s => s.trim()).filter(Boolean);
   });
-  setData("programs", programs);
-  showToast("Program Belajar berhasil disimpan!");
+
+  try {
+    await apiPut("/api/content/programs", _programs);
+    showToast("Program Belajar berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== SCHEDULE =====
 // ===========================
-function loadSchedule() {
-  const schedule = getData("schedule");
-  renderSchedule(schedule);
+let _schedules = [];
+
+function loadSchedule(schedules) {
+  _schedules = schedules.map(s => ({
+    day: s.day || "",
+    time: s.time || "",
+    desc: s.description || s.desc || "",
+  }));
+  renderSchedule();
 }
 
-function renderSchedule(schedule) {
+function renderSchedule() {
   const container = document.getElementById("schedule-list");
   container.innerHTML = "";
-  schedule.forEach((s, i) => {
+  _schedules.forEach((s, i) => {
     container.innerHTML += `
       <div class="list-item">
         <div class="list-item-header">
@@ -440,161 +435,241 @@ function renderSchedule(schedule) {
 }
 
 function addSchedule() {
-  const schedule = getData("schedule");
-  schedule.push({ day: "Hari", time: "00.00 – 00.00 WIB", desc: "Keterangan" });
-  setData("schedule", schedule);
-  renderSchedule(schedule);
+  _schedules.push({ day: "Hari", time: "00.00 – 00.00 WIB", desc: "Keterangan" });
+  renderSchedule();
 }
 
 function removeSchedule(index) {
-  const schedule = getData("schedule");
-  schedule.splice(index, 1);
-  setData("schedule", schedule);
-  renderSchedule(schedule);
+  _schedules.splice(index, 1);
+  renderSchedule();
 }
 
-function saveSchedule() {
-  const schedule = getData("schedule");
-  schedule.forEach((s, i) => {
+async function saveSchedule() {
+  _schedules.forEach((s, i) => {
     s.day = document.getElementById(`sch-day-${i}`)?.value || s.day;
     s.time = document.getElementById(`sch-time-${i}`)?.value || s.time;
     s.desc = document.getElementById(`sch-desc-${i}`)?.value || s.desc;
   });
-  setData("schedule", schedule);
-  showToast("Jadwal Belajar berhasil disimpan!");
+
+  try {
+    await apiPut("/api/content/schedule", _schedules.map(s => ({
+      day: s.day,
+      time: s.time,
+      description: s.desc,
+    })));
+    showToast("Jadwal Belajar berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== LOCATION =====
 // ===========================
-function loadLocation() {
-  const d = getData("location");
+function loadLocation(d) {
   document.getElementById("loc-name").value = d.name || "";
   document.getElementById("loc-address").value = d.address || "";
   document.getElementById("loc-note").value = d.note || "";
 }
 
-function saveLocation() {
-  setData("location", {
-    name: document.getElementById("loc-name").value,
-    address: document.getElementById("loc-address").value,
-    note: document.getElementById("loc-note").value,
-  });
-  showToast("Lokasi berhasil disimpan!");
+async function saveLocation() {
+  try {
+    await apiPut("/api/content/location", {
+      name: document.getElementById("loc-name").value,
+      address: document.getElementById("loc-address").value,
+      note: document.getElementById("loc-note").value,
+    });
+    showToast("Lokasi berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== LINKS =====
 // ===========================
-function loadLinks() {
-  const d = getData("links");
+function loadLinks(d) {
   document.getElementById("link-wa").value = d.wa || "";
   document.getElementById("link-ig").value = d.ig || "";
   document.getElementById("link-wa-msg").value = d.waMsg || "";
 }
 
-function saveLinks() {
-  setData("links", {
-    wa: document.getElementById("link-wa").value,
-    ig: document.getElementById("link-ig").value,
-    waMsg: document.getElementById("link-wa-msg").value,
-  });
-  showToast("Tautan & Kontak berhasil disimpan!");
+async function saveLinks() {
+  try {
+    await apiPut("/api/content/links", {
+      wa: document.getElementById("link-wa").value,
+      ig: document.getElementById("link-ig").value,
+      waMsg: document.getElementById("link-wa-msg").value,
+    });
+    showToast("Tautan & Kontak berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== GALLERY =====
 // ===========================
-function loadGallery() {
-  const gallery = getData("gallery");
-  renderGallery(gallery);
+let _gallery = [];
+
+function loadGallery(gallery) {
+  _gallery = gallery.map(g => ({ ...g }));
+  renderGallery();
 }
 
-function renderGallery(gallery) {
+function renderGallery() {
   const container = document.getElementById("gallery-list");
   container.innerHTML = "";
-  if (gallery.length === 0) {
+
+  if (_gallery.length === 0) {
     container.innerHTML = `<p style="color:#8787a3;font-size:0.85rem;margin-bottom:0.75rem;">Belum ada gambar. Klik "Tambah Gambar" untuk menambahkan.</p>`;
     return;
   }
-  gallery.forEach((g, i) => {
+
+  _gallery.forEach((g, i) => {
     container.innerHTML += `
-      <div class="list-item">
+      <div class="list-item" id="gallery-item-${i}">
         <div class="list-item-header">
           <span class="list-item-title">Gambar #${i + 1}</span>
-          <button class="btn-danger" onclick="removeGalleryItem(${i})">
+          <button class="btn-danger" onclick="removeGalleryItem('${g.id}', ${i})">
             <i class="ph-fill ph-trash"></i> Hapus
           </button>
         </div>
-        <div class="form-group">
-          <label>URL Gambar</label>
-          <input type="url" id="gal-url-${i}" value="${escHtml(g.url)}" placeholder="https://..." oninput="previewGalleryImage(${i})">
-        </div>
+        ${g.public_url ? `<img src="${escHtml(g.public_url)}" class="gallery-preview" alt="Preview">` : ""}
         <div class="form-group">
           <label>Keterangan (opsional)</label>
           <input type="text" id="gal-caption-${i}" value="${escHtml(g.caption || "")}" placeholder="Keterangan gambar...">
         </div>
-        ${g.url ? `<img src="${escHtml(g.url)}" class="gallery-preview" id="gal-preview-${i}" alt="Preview" onerror="this.style.display='none'">` : `<div class="gallery-preview-placeholder" id="gal-preview-${i}"><i class="ph ph-image" style="font-size:1.5rem;margin-right:0.5rem"></i> Preview gambar</div>`}
+        <button class="btn-secondary" style="align-self:flex-start" onclick="updateGalleryCaption('${g.id}', ${i})">
+          <i class="ph-fill ph-floppy-disk"></i> Simpan Keterangan
+        </button>
       </div>`;
   });
 }
 
 function addGalleryItem() {
-  const gallery = getData("gallery");
-  gallery.push({ url: "", caption: "" });
-  setData("gallery", gallery);
-  renderGallery(gallery);
+  // Trigger file input
+  const fileInput = document.getElementById("gallery-file-input");
+  if (fileInput) fileInput.click();
 }
 
-function removeGalleryItem(index) {
-  const gallery = getData("gallery");
-  gallery.splice(index, 1);
-  setData("gallery", gallery);
-  renderGallery(gallery);
+async function handleGalleryFileSelect(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  const captionInput = document.getElementById("gallery-upload-caption");
+  const caption = captionInput ? captionInput.value : "";
+
+  for (const file of files) {
+    await uploadGalleryFile(file, caption);
+  }
+
+  input.value = ""; // Reset input
+  if (captionInput) captionInput.value = "";
 }
 
-function previewGalleryImage(index) {
-  const url = document.getElementById(`gal-url-${index}`)?.value;
-  const preview = document.getElementById(`gal-preview-${index}`);
-  if (!preview) return;
-  if (url) {
-    if (preview.tagName === "IMG") {
-      preview.src = url;
-      preview.style.display = "";
-    } else {
-      const img = document.createElement("img");
-      img.src = url;
-      img.className = "gallery-preview";
-      img.id = `gal-preview-${index}`;
-      img.alt = "Preview";
-      img.onerror = () => { img.style.display = "none"; };
-      preview.replaceWith(img);
+async function uploadGalleryFile(file, caption = "") {
+  const formData = new FormData();
+  formData.append("file", file);
+  if (caption) formData.append("caption", caption);
+
+  const uploadBtn = document.getElementById("gallery-upload-btn");
+  if (uploadBtn) {
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<i class="ph-fill ph-spinner"></i> Mengupload...';
+  }
+
+  try {
+    const res = await fetch("/api/gallery/upload", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${getToken()}` },
+      body: formData,
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showToast(data.error || "Upload gagal", "error");
+      return;
+    }
+
+    // Tambahkan ke list
+    _gallery.push({
+      id: data.id,
+      public_url: data.public_url,
+      caption: data.caption || "",
+    });
+    renderGallery();
+    showToast(`Gambar berhasil diupload dan dikonversi ke WebP!`);
+  } catch (err) {
+    showToast("Gagal upload: " + err.message, "error");
+  } finally {
+    if (uploadBtn) {
+      uploadBtn.disabled = false;
+      uploadBtn.innerHTML = '<i class="ph-fill ph-upload"></i> Upload Gambar';
     }
   }
 }
 
+async function removeGalleryItem(id, index) {
+  if (!confirm("Hapus foto ini?")) return;
+
+  try {
+    await apiDelete(`/api/gallery/${id}`);
+    _gallery.splice(index, 1);
+    renderGallery();
+    showToast("Foto berhasil dihapus!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function updateGalleryCaption(id, index) {
+  const caption = document.getElementById(`gal-caption-${index}`)?.value || "";
+
+  try {
+    const res = await fetch(`/api/gallery/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ caption }),
+    });
+
+    if (!res.ok) throw new Error("Gagal update keterangan");
+
+    _gallery[index].caption = caption;
+    showToast("Keterangan berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+// Dummy saveGallery (tidak diperlukan karena upload langsung)
 function saveGallery() {
-  const gallery = getData("gallery");
-  gallery.forEach((g, i) => {
-    g.url = document.getElementById(`gal-url-${i}`)?.value || g.url;
-    g.caption = document.getElementById(`gal-caption-${i}`)?.value || "";
-  });
-  setData("gallery", gallery);
-  showToast("Galeri berhasil disimpan!");
+  showToast("Gunakan tombol Upload untuk menambah gambar baru");
 }
 
 // ===========================
 // ===== TESTIMONIALS =====
 // ===========================
-function loadTestimonials() {
-  const testimonials = getData("testimonials");
-  renderTestimonials(testimonials);
+let _testimonials = [];
+
+function loadTestimonials(testimonials) {
+  _testimonials = testimonials.map(t => ({
+    text: t.text || "",
+    name: t.author_name || t.name || "",
+    role: t.author_role || t.role || "",
+    stars: t.stars || 5,
+  }));
+  renderTestimonials();
 }
 
-function renderTestimonials(testimonials) {
+function renderTestimonials() {
   const container = document.getElementById("testimonials-list");
   container.innerHTML = "";
-  testimonials.forEach((t, i) => {
+  _testimonials.forEach((t, i) => {
     container.innerHTML += `
       <div class="list-item">
         <div class="list-item-header">
@@ -631,91 +706,101 @@ function renderTestimonials(testimonials) {
 function setStars(testimonialIndex, stars) {
   document.getElementById(`test-stars-${testimonialIndex}`).value = stars;
   const btns = document.querySelectorAll(`#stars-${testimonialIndex} button`);
-  btns.forEach((btn, i) => {
-    btn.classList.toggle("active", i < stars);
-  });
+  btns.forEach((btn, i) => btn.classList.toggle("active", i < stars));
 }
 
 function addTestimonial() {
-  const testimonials = getData("testimonials");
-  testimonials.push({ text: '"Testimoni baru..."', name: "Nama", role: "Peran", stars: 5 });
-  setData("testimonials", testimonials);
-  renderTestimonials(testimonials);
+  _testimonials.push({ text: '"Testimoni baru..."', name: "Nama", role: "Peran", stars: 5 });
+  renderTestimonials();
 }
 
 function removeTestimonial(index) {
-  const testimonials = getData("testimonials");
-  testimonials.splice(index, 1);
-  setData("testimonials", testimonials);
-  renderTestimonials(testimonials);
+  _testimonials.splice(index, 1);
+  renderTestimonials();
 }
 
-function saveTestimonials() {
-  const testimonials = getData("testimonials");
-  testimonials.forEach((t, i) => {
+async function saveTestimonials() {
+  _testimonials.forEach((t, i) => {
     t.text = document.getElementById(`test-text-${i}`)?.value || t.text;
     t.name = document.getElementById(`test-name-${i}`)?.value || t.name;
     t.role = document.getElementById(`test-role-${i}`)?.value || t.role;
     t.stars = parseInt(document.getElementById(`test-stars-${i}`)?.value) || 5;
   });
-  setData("testimonials", testimonials);
-  showToast("Testimoni berhasil disimpan!");
+
+  try {
+    await apiPut("/api/content/testimonials", _testimonials.map(t => ({
+      text: t.text,
+      name: t.name,
+      role: t.role,
+      stars: t.stars,
+    })));
+    showToast("Testimoni berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== FOOTER =====
 // ===========================
-function loadFooter() {
-  const d = getData("footer");
+function loadFooter(d) {
   document.getElementById("footer-name").value = d.name || "";
   document.getElementById("footer-tagline").value = d.tagline || "";
   document.getElementById("footer-copy").value = d.copy || "";
 }
 
-function saveFooter() {
-  setData("footer", {
-    name: document.getElementById("footer-name").value,
-    tagline: document.getElementById("footer-tagline").value,
-    copy: document.getElementById("footer-copy").value,
-  });
-  showToast("Footer berhasil disimpan!");
+async function saveFooter() {
+  try {
+    await apiPut("/api/content/footer", {
+      name: document.getElementById("footer-name").value,
+      tagline: document.getElementById("footer-tagline").value,
+      copy: document.getElementById("footer-copy").value,
+    });
+    showToast("Footer berhasil disimpan!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
 }
 
 // ===========================
 // ===== CHANGE PASSWORD =====
 // ===========================
-function changePassword() {
+async function changePassword() {
   const oldPw = document.getElementById("old-password").value;
   const newPw = document.getElementById("new-password").value;
   const confirmPw = document.getElementById("confirm-password").value;
   const msgEl = document.getElementById("pw-msg");
 
-  const creds = getData("credentials");
-
-  if (oldPw !== creds.password) {
-    msgEl.textContent = "Password lama tidak sesuai.";
+  if (!oldPw || !newPw || !confirmPw) {
+    msgEl.textContent = "Semua field wajib diisi.";
     msgEl.className = "pw-msg error";
     return;
   }
+
   if (newPw.length < 6) {
     msgEl.textContent = "Password baru minimal 6 karakter.";
     msgEl.className = "pw-msg error";
     return;
   }
+
   if (newPw !== confirmPw) {
     msgEl.textContent = "Konfirmasi password tidak cocok.";
     msgEl.className = "pw-msg error";
     return;
   }
 
-  creds.password = newPw;
-  setData("credentials", creds);
-  msgEl.textContent = "Password berhasil diubah!";
-  msgEl.className = "pw-msg success";
-  document.getElementById("old-password").value = "";
-  document.getElementById("new-password").value = "";
-  document.getElementById("confirm-password").value = "";
-  showToast("Password berhasil diubah!");
+  try {
+    await apiPost("/api/auth/change-password", { oldPassword: oldPw, newPassword: newPw });
+    msgEl.textContent = "Password berhasil diubah!";
+    msgEl.className = "pw-msg success";
+    document.getElementById("old-password").value = "";
+    document.getElementById("new-password").value = "";
+    document.getElementById("confirm-password").value = "";
+    showToast("Password berhasil diubah!");
+  } catch (err) {
+    msgEl.textContent = err.message;
+    msgEl.className = "pw-msg error";
+  }
 }
 
 // ===========================
