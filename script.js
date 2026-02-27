@@ -52,6 +52,24 @@ if (daftarBtn) {
 }
 
 /**
+ * Back to Top Button
+ * Muncul saat halaman di-scroll ke bawah, hilang saat sudah di atas
+ */
+const backToTopBtn = document.getElementById("back-to-top");
+
+window.addEventListener("scroll", () => {
+  if (window.scrollY > 200) {
+    backToTopBtn.classList.add("visible");
+  } else {
+    backToTopBtn.classList.remove("visible");
+  }
+});
+
+backToTopBtn.addEventListener("click", () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/**
  * Toast notification helper
  */
 function showToast(message) {
