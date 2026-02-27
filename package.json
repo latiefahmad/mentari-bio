@@ -1,0 +1,20 @@
+{
+  "name": "mentari-bio",
+  "version": "1.0.0",
+  "description": "Rumah Belajar Mentari - Website & Admin Panel",
+  "private": true,
+  "engines": {
+    "node": ">=18.x"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.1",
+    "bcryptjs": "^2.4.3",
+    "busboy": "^1.6.0",
+    "jsonwebtoken": "^9.0.2",
+    "sharp": "^0.33.5"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}
