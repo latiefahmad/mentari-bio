@@ -1,31 +1,28 @@
-import { supabase } from "../../lib/supabase.js";
-import { verifyPassword, hashPassword, getAuthPayload, unauthorizedResponse } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { verifyPassword, hashPassword, getAuthPayload } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   if (req.method !== "POST") {
-    return errorResponse("Method not allowed", 405);
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const payload = getAuthPayload(req);
-  if (!payload) return unauthorizedResponse();
+  if (!payload) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const body = await req.json();
-    const { oldPassword, newPassword } = body;
+    const { oldPassword, newPassword } = req.body || {};
 
     if (!oldPassword || !newPassword) {
-      return errorResponse("Password lama dan baru wajib diisi");
+      return res.status(400).json({ error: "Password lama dan baru wajib diisi" });
     }
 
     if (newPassword.length < 6) {
-      return errorResponse("Password baru minimal 6 karakter");
+      return res.status(400).json({ error: "Password baru minimal 6 karakter" });
     }
 
-    // Ambil user
     const { data: user, error } = await supabase
       .from("admin_users")
       .select("id, password_hash")
@@ -33,19 +30,16 @@ export default async function handler(req) {
       .single();
 
     if (error || !user) {
-      return errorResponse("User tidak ditemukan", 404);
+      return res.status(404).json({ error: "User tidak ditemukan" });
     }
 
-    // Verifikasi password lama
     const isValid = await verifyPassword(oldPassword, user.password_hash);
     if (!isValid) {
-      return errorResponse("Password lama tidak sesuai", 401);
+      return res.status(401).json({ error: "Password lama tidak sesuai" });
     }
 
-    // Hash password baru
     const newHash = await hashPassword(newPassword);
 
-    // Update
     const { error: updateError } = await supabase
       .from("admin_users")
       .update({ password_hash: newHash })
@@ -53,9 +47,9 @@ export default async function handler(req) {
 
     if (updateError) throw updateError;
 
-    return jsonResponse({ message: "Password berhasil diubah" });
+    return res.status(200).json({ message: "Password berhasil diubah" });
   } catch (err) {
     console.error("Change password error:", err);
-    return errorResponse("Terjadi kesalahan server", 500);
+    return res.status(500).json({ error: "Terjadi kesalahan server: " + err.message });
   }
-}
+};

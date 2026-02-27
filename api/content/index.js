@@ -1,21 +1,14 @@
-/**
- * GET /api/content
- * Ambil semua konten publik sekaligus (hero, about, location, links, footer,
- * programs, schedules, testimonials)
- */
-import { supabase } from "../../lib/supabase.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { handleCors } = require("../../lib/cors.js");
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   if (req.method !== "GET") {
-    return errorResponse("Method not allowed", 405);
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    // Ambil semua data paralel
     const [contentResult, programsResult, schedulesResult, testimonialsResult] =
       await Promise.all([
         supabase.from("site_content").select("key, value"),
@@ -24,13 +17,12 @@ export default async function handler(req) {
         supabase.from("testimonials").select("*").order("sort_order"),
       ]);
 
-    // Konversi site_content array ke object
     const contentMap = {};
     (contentResult.data || []).forEach((row) => {
       contentMap[row.key] = row.value;
     });
 
-    return jsonResponse({
+    return res.status(200).json({
       hero: contentMap.hero || {},
       about: contentMap.about || {},
       location: contentMap.location || {},
@@ -42,6 +34,6 @@ export default async function handler(req) {
     });
   } catch (err) {
     console.error("GET /api/content error:", err);
-    return errorResponse("Terjadi kesalahan server", 500);
+    return res.status(500).json({ error: "Terjadi kesalahan server: " + err.message });
   }
-}
+};

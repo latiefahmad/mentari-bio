@@ -1,24 +1,21 @@
-import { supabase } from "../../lib/supabase.js";
-import { verifyPassword, signToken } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { verifyPassword, signToken } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   if (req.method !== "POST") {
-    return errorResponse("Method not allowed", 405);
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const body = await req.json();
-    const { username, password } = body;
+    const { username, password } = req.body || {};
 
     if (!username || !password) {
-      return errorResponse("Username dan password wajib diisi");
+      return res.status(400).json({ error: "Username dan password wajib diisi" });
     }
 
-    // Cari admin user
     const { data: user, error } = await supabase
       .from("admin_users")
       .select("id, username, password_hash")
@@ -26,21 +23,18 @@ export default async function handler(req) {
       .single();
 
     if (error || !user) {
-      return errorResponse("Username atau password salah", 401);
+      return res.status(401).json({ error: "Username atau password salah" });
     }
 
-    // Verifikasi password
     const isValid = await verifyPassword(password, user.password_hash);
     if (!isValid) {
-      return errorResponse("Username atau password salah", 401);
+      return res.status(401).json({ error: "Username atau password salah" });
     }
 
-    // Buat JWT token
     const token = signToken({ userId: user.id, username: user.username });
-
-    return jsonResponse({ token, username: user.username });
+    return res.status(200).json({ token, username: user.username });
   } catch (err) {
     console.error("Login error:", err);
-    return errorResponse("Terjadi kesalahan server", 500);
+    return res.status(500).json({ error: "Terjadi kesalahan server: " + err.message });
   }
-}
+};

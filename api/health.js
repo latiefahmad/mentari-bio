@@ -1,11 +1,7 @@
-/**
- * GET /api/health
- * Health check endpoint untuk debugging
- */
-import { jsonResponse } from "../lib/cors.js";
+const { jsonResponse } = require("../lib/cors.js");
 
-export default async function handler(req) {
-  return jsonResponse({
+module.exports = async function handler(req, res) {
+  const data = {
     status: "ok",
     timestamp: new Date().toISOString(),
     env: {
@@ -13,5 +9,6 @@ export default async function handler(req) {
       supabaseKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
       jwtSecret: !!process.env.JWT_SECRET,
     },
-  });
-}
+  };
+  res.status(200).json(data);
+};

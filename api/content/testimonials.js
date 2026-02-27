@@ -1,14 +1,9 @@
-/**
- * GET  /api/content/testimonials  - Ambil semua testimoni (publik)
- * PUT  /api/content/testimonials  - Ganti semua testimoni (admin)
- */
-import { supabase } from "../../lib/supabase.js";
-import { getAuthPayload, unauthorizedResponse } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { getAuthPayload } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   if (req.method === "GET") {
     try {
@@ -18,31 +13,23 @@ export default async function handler(req) {
         .order("sort_order");
 
       if (error) throw error;
-      return jsonResponse(data || []);
+      return res.status(200).json(data || []);
     } catch (err) {
-      console.error("GET /api/content/testimonials error:", err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
   if (req.method === "PUT") {
     const payload = getAuthPayload(req);
-    if (!payload) return unauthorizedResponse();
+    if (!payload) return res.status(401).json({ error: "Unauthorized" });
 
     try {
-      const testimonials = await req.json();
-
+      const testimonials = req.body;
       if (!Array.isArray(testimonials)) {
-        return errorResponse("Data harus berupa array");
+        return res.status(400).json({ error: "Data harus berupa array" });
       }
 
-      // Hapus semua testimoni lama, lalu insert baru
-      const { error: deleteError } = await supabase
-        .from("testimonials")
-        .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
-
-      if (deleteError) throw deleteError;
+      await supabase.from("testimonials").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
       if (testimonials.length > 0) {
         const rows = testimonials.map((t, i) => ({
@@ -52,20 +39,15 @@ export default async function handler(req) {
           stars: Math.min(5, Math.max(1, parseInt(t.stars) || 5)),
           sort_order: i + 1,
         }));
-
-        const { error: insertError } = await supabase
-          .from("testimonials")
-          .insert(rows);
-
-        if (insertError) throw insertError;
+        const { error } = await supabase.from("testimonials").insert(rows);
+        if (error) throw error;
       }
 
-      return jsonResponse({ message: "Testimoni berhasil disimpan" });
+      return res.status(200).json({ message: "Testimoni berhasil disimpan" });
     } catch (err) {
-      console.error("PUT /api/content/testimonials error:", err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
-  return errorResponse("Method not allowed", 405);
-}
+  return res.status(405).json({ error: "Method not allowed" });
+};

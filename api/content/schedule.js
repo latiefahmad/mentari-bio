@@ -1,14 +1,9 @@
-/**
- * GET  /api/content/schedule  - Ambil semua jadwal (publik)
- * PUT  /api/content/schedule  - Ganti semua jadwal (admin)
- */
-import { supabase } from "../../lib/supabase.js";
-import { getAuthPayload, unauthorizedResponse } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { getAuthPayload } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   if (req.method === "GET") {
     try {
@@ -18,31 +13,23 @@ export default async function handler(req) {
         .order("sort_order");
 
       if (error) throw error;
-      return jsonResponse(data || []);
+      return res.status(200).json(data || []);
     } catch (err) {
-      console.error("GET /api/content/schedule error:", err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
   if (req.method === "PUT") {
     const payload = getAuthPayload(req);
-    if (!payload) return unauthorizedResponse();
+    if (!payload) return res.status(401).json({ error: "Unauthorized" });
 
     try {
-      const schedules = await req.json();
-
+      const schedules = req.body;
       if (!Array.isArray(schedules)) {
-        return errorResponse("Data harus berupa array");
+        return res.status(400).json({ error: "Data harus berupa array" });
       }
 
-      // Hapus semua jadwal lama, lalu insert baru
-      const { error: deleteError } = await supabase
-        .from("schedules")
-        .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000");
-
-      if (deleteError) throw deleteError;
+      await supabase.from("schedules").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
       if (schedules.length > 0) {
         const rows = schedules.map((s, i) => ({
@@ -51,20 +38,15 @@ export default async function handler(req) {
           description: s.description || s.desc || "",
           sort_order: i + 1,
         }));
-
-        const { error: insertError } = await supabase
-          .from("schedules")
-          .insert(rows);
-
-        if (insertError) throw insertError;
+        const { error } = await supabase.from("schedules").insert(rows);
+        if (error) throw error;
       }
 
-      return jsonResponse({ message: "Jadwal berhasil disimpan" });
+      return res.status(200).json({ message: "Jadwal berhasil disimpan" });
     } catch (err) {
-      console.error("PUT /api/content/schedule error:", err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
-  return errorResponse("Method not allowed", 405);
-}
+  return res.status(405).json({ error: "Method not allowed" });
+};

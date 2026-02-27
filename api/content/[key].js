@@ -1,36 +1,27 @@
-/**
- * PUT /api/content/[key]
- * Update konten berdasarkan key: hero, about, location, links, footer
- * Memerlukan JWT auth
- */
-import { supabase } from "../../lib/supabase.js";
-import { getAuthPayload, unauthorizedResponse } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { getAuthPayload } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
 const ALLOWED_KEYS = ["hero", "about", "location", "links", "footer"];
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
-  // Ambil key dari URL path
-  const url = new URL(req.url);
-  const pathParts = url.pathname.split("/");
-  const key = pathParts[pathParts.length - 1];
+  const key = req.query.key;
 
   if (!ALLOWED_KEYS.includes(key)) {
-    return errorResponse(`Key '${key}' tidak valid. Gunakan: ${ALLOWED_KEYS.join(", ")}`, 400);
+    return res.status(400).json({ error: `Key '${key}' tidak valid` });
   }
 
   if (req.method !== "PUT") {
-    return errorResponse("Method not allowed", 405);
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const payload = getAuthPayload(req);
-  if (!payload) return unauthorizedResponse();
+  if (!payload) return res.status(401).json({ error: "Unauthorized" });
 
   try {
-    const value = await req.json();
+    const value = req.body;
 
     const { error } = await supabase
       .from("site_content")
@@ -41,9 +32,9 @@ export default async function handler(req) {
 
     if (error) throw error;
 
-    return jsonResponse({ message: `Konten '${key}' berhasil disimpan`, key, value });
+    return res.status(200).json({ message: `Konten '${key}' berhasil disimpan`, key });
   } catch (err) {
     console.error(`PUT /api/content/${key} error:`, err);
-    return errorResponse("Terjadi kesalahan server", 500);
+    return res.status(500).json({ error: "Terjadi kesalahan server: " + err.message });
   }
-}
+};

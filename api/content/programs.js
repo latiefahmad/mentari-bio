@@ -1,14 +1,9 @@
-/**
- * GET  /api/content/programs  - Ambil semua program (publik)
- * PUT  /api/content/programs  - Ganti semua program (admin)
- */
-import { supabase } from "../../lib/supabase.js";
-import { getAuthPayload, unauthorizedResponse } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { getAuthPayload } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   if (req.method === "GET") {
     try {
@@ -18,31 +13,23 @@ export default async function handler(req) {
         .order("sort_order");
 
       if (error) throw error;
-      return jsonResponse(data || []);
+      return res.status(200).json(data || []);
     } catch (err) {
-      console.error("GET /api/content/programs error:", err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
   if (req.method === "PUT") {
     const payload = getAuthPayload(req);
-    if (!payload) return unauthorizedResponse();
+    if (!payload) return res.status(401).json({ error: "Unauthorized" });
 
     try {
-      const programs = await req.json();
-
+      const programs = req.body;
       if (!Array.isArray(programs)) {
-        return errorResponse("Data harus berupa array");
+        return res.status(400).json({ error: "Data harus berupa array" });
       }
 
-      // Hapus semua program lama, lalu insert baru
-      const { error: deleteError } = await supabase
-        .from("programs")
-        .delete()
-        .neq("id", "00000000-0000-0000-0000-000000000000"); // delete all
-
-      if (deleteError) throw deleteError;
+      await supabase.from("programs").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
       if (programs.length > 0) {
         const rows = programs.map((p, i) => ({
@@ -53,20 +40,15 @@ export default async function handler(req) {
           is_featured: p.is_featured || false,
           sort_order: i + 1,
         }));
-
-        const { error: insertError } = await supabase
-          .from("programs")
-          .insert(rows);
-
-        if (insertError) throw insertError;
+        const { error } = await supabase.from("programs").insert(rows);
+        if (error) throw error;
       }
 
-      return jsonResponse({ message: "Program berhasil disimpan" });
+      return res.status(200).json({ message: "Program berhasil disimpan" });
     } catch (err) {
-      console.error("PUT /api/content/programs error:", err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
-  return errorResponse("Method not allowed", 405);
-}
+  return res.status(405).json({ error: "Method not allowed" });
+};

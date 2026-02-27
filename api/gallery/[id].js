@@ -1,34 +1,23 @@
-/**
- * DELETE /api/gallery/:id  - Hapus foto dari DB + Supabase Storage
- * PUT    /api/gallery/:id  - Update caption / sort_order
- * Memerlukan JWT auth
- */
-import { supabase } from "../../lib/supabase.js";
-import { getAuthPayload, unauthorizedResponse } from "../../lib/auth.js";
-import { handleCors, jsonResponse, errorResponse } from "../../lib/cors.js";
+const { supabase } = require("../../lib/supabase.js");
+const { getAuthPayload } = require("../../lib/auth.js");
+const { handleCors } = require("../../lib/cors.js");
 
 const STORAGE_BUCKET = "gallery";
 
-export default async function handler(req) {
-  const corsResult = handleCors(req);
-  if (corsResult) return corsResult;
+module.exports = async function handler(req, res) {
+  if (handleCors(req, res)) return;
 
   const payload = getAuthPayload(req);
-  if (!payload) return unauthorizedResponse();
+  if (!payload) return res.status(401).json({ error: "Unauthorized" });
 
-  // Ambil id dari URL path
-  const url = new URL(req.url);
-  const pathParts = url.pathname.split("/");
-  const id = pathParts[pathParts.length - 1];
+  const id = req.query.id;
 
-  if (!id || id === "undefined") {
-    return errorResponse("ID tidak valid");
+  if (!id) {
+    return res.status(400).json({ error: "ID tidak valid" });
   }
 
-  // DELETE
   if (req.method === "DELETE") {
     try {
-      // Ambil storage_path dulu
       const { data: item, error: fetchError } = await supabase
         .from("gallery")
         .select("id, storage_path")
@@ -36,20 +25,11 @@ export default async function handler(req) {
         .single();
 
       if (fetchError || !item) {
-        return errorResponse("Foto tidak ditemukan", 404);
+        return res.status(404).json({ error: "Foto tidak ditemukan" });
       }
 
-      // Hapus dari Supabase Storage
-      const { error: storageError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .remove([item.storage_path]);
+      await supabase.storage.from(STORAGE_BUCKET).remove([item.storage_path]);
 
-      if (storageError) {
-        console.warn("Storage delete warning:", storageError);
-        // Lanjutkan meski storage error (mungkin file sudah tidak ada)
-      }
-
-      // Hapus dari database
       const { error: dbError } = await supabase
         .from("gallery")
         .delete()
@@ -57,24 +37,22 @@ export default async function handler(req) {
 
       if (dbError) throw dbError;
 
-      return jsonResponse({ message: "Foto berhasil dihapus" });
+      return res.status(200).json({ message: "Foto berhasil dihapus" });
     } catch (err) {
-      console.error(`DELETE /api/gallery/${id} error:`, err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
-  // PUT - Update caption / sort_order
   if (req.method === "PUT") {
     try {
-      const body = await req.json();
       const updates = {};
+      const body = req.body || {};
 
       if (body.caption !== undefined) updates.caption = body.caption;
       if (body.sort_order !== undefined) updates.sort_order = parseInt(body.sort_order);
 
       if (Object.keys(updates).length === 0) {
-        return errorResponse("Tidak ada data yang diupdate");
+        return res.status(400).json({ error: "Tidak ada data yang diupdate" });
       }
 
       const { data, error } = await supabase
@@ -85,14 +63,13 @@ export default async function handler(req) {
         .single();
 
       if (error) throw error;
-      if (!data) return errorResponse("Foto tidak ditemukan", 404);
+      if (!data) return res.status(404).json({ error: "Foto tidak ditemukan" });
 
-      return jsonResponse({ message: "Foto berhasil diupdate", item: data });
+      return res.status(200).json({ message: "Foto berhasil diupdate", item: data });
     } catch (err) {
-      console.error(`PUT /api/gallery/${id} error:`, err);
-      return errorResponse("Terjadi kesalahan server", 500);
+      return res.status(500).json({ error: err.message });
     }
   }
 
-  return errorResponse("Method not allowed", 405);
-}
+  return res.status(405).json({ error: "Method not allowed" });
+};
