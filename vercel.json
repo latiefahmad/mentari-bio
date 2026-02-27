@@ -1,4 +1,5 @@
 {
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
   ],
@@ -6,6 +7,5 @@
     "api/**/*.js": {
       "maxDuration": 30
     }
-  },
-  "buildCommand": "npm install"
+  }
 }
