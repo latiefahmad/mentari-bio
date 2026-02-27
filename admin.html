@@ -17,37 +17,83 @@
 
     <!-- ===== LOGIN PAGE ===== -->
     <div id="login-page" class="login-page">
-        <div class="login-card">
-            <img src="./img/mentari-mark.png" alt="Logo" class="login-logo">
-            <h1>Admin Panel</h1>
-            <p class="login-subtitle">Rumah Belajar Mentari</p>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <div class="input-wrapper">
-                        <i class="ph-fill ph-user"></i>
-                        <input type="text" id="username" placeholder="Masukkan username" autocomplete="username">
-                    </div>
+
+        <!-- Animated background blobs -->
+        <div class="login-bg">
+            <div class="login-blob lb-1"></div>
+            <div class="login-blob lb-2"></div>
+            <div class="login-blob lb-3"></div>
+        </div>
+
+        <!-- Left panel: branding -->
+        <div class="login-left">
+            <div class="login-brand">
+                <img src="./img/mentari-mark.png" alt="Logo" class="login-brand-logo">
+                <div>
+                    <p class="login-brand-name">Rumah Belajar Mentari</p>
+                    <p class="login-brand-tag">Lembaga Bimbingan Belajar</p>
                 </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <div class="input-wrapper">
-                        <i class="ph-fill ph-lock"></i>
-                        <input type="password" id="password" placeholder="Masukkan password" autocomplete="current-password">
-                        <button type="button" id="toggle-password" class="toggle-pw">
-                            <i class="ph ph-eye" id="eye-icon"></i>
-                        </button>
-                    </div>
+            </div>
+            <div class="login-hero-text">
+                <h2>Kelola Website<br>dengan Mudah</h2>
+                <p>Panel admin untuk mengatur semua konten, galeri, dan informasi Rumah Belajar Mentari.</p>
+            </div>
+            <div class="login-features">
+                <div class="login-feature">
+                    <div class="login-feature-icon"><i class="ph-fill ph-pencil-simple"></i></div>
+                    <span>Edit konten real-time</span>
                 </div>
-                <p id="login-error" class="login-error"></p>
-                <button type="submit" class="btn-primary btn-full">
-                    <i class="ph-fill ph-sign-in"></i>
-                    Masuk
-                </button>
-            </form>
-            <a href="index.html" class="back-link">
-                <i class="ph-fill ph-arrow-left"></i> Kembali ke halaman utama
-            </a>
+                <div class="login-feature">
+                    <div class="login-feature-icon"><i class="ph-fill ph-images"></i></div>
+                    <span>Kelola galeri foto</span>
+                </div>
+                <div class="login-feature">
+                    <div class="login-feature-icon"><i class="ph-fill ph-shield-check"></i></div>
+                    <span>Akses aman & terenkripsi</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right panel: form -->
+        <div class="login-right">
+            <div class="login-card">
+                <div class="login-card-header">
+                    <div class="login-avatar">
+                        <i class="ph-fill ph-lock-key"></i>
+                    </div>
+                    <h1>Selamat Datang</h1>
+                    <p class="login-subtitle">Masuk ke panel admin</p>
+                </div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-wrapper">
+                            <i class="ph-fill ph-user"></i>
+                            <input type="text" id="username" placeholder="Masukkan username" autocomplete="username">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i class="ph-fill ph-lock"></i>
+                            <input type="password" id="password" placeholder="Masukkan password" autocomplete="current-password">
+                            <button type="button" id="toggle-password" class="toggle-pw">
+                                <i class="ph ph-eye" id="eye-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="login-error" class="login-error"></p>
+                    <button type="submit" class="btn-login">
+                        <span>Masuk</span>
+                        <i class="ph-fill ph-arrow-right"></i>
+                    </button>
+                </form>
+
+                <a href="index.html" class="back-link">
+                    <i class="ph-fill ph-arrow-left"></i> Kembali ke halaman utama
+                </a>
+            </div>
         </div>
     </div>
 

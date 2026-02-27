@@ -113,7 +113,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
 
   errorEl.textContent = "";
   submitBtn.disabled = true;
-  submitBtn.innerHTML = '<i class="ph-fill ph-spinner"></i> Masuk...';
+  submitBtn.innerHTML = '<i class="ph-fill ph-circle-notch" style="animation:spin 1s linear infinite"></i> Masuk...';
 
   try {
     const res = await fetch("/api/auth/login", {
@@ -135,7 +135,7 @@ document.getElementById("login-form").addEventListener("submit", async (e) => {
     errorEl.textContent = "Tidak dapat terhubung ke server";
   } finally {
     submitBtn.disabled = false;
-    submitBtn.innerHTML = '<i class="ph-fill ph-sign-in"></i> Masuk';
+    submitBtn.innerHTML = '<span>Masuk</span><i class="ph-fill ph-arrow-right"></i>';
   }
 });
 
