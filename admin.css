@@ -927,4 +927,49 @@ textarea::placeholder {
   .tab-content {
     padding: 1rem;
   }
+
+  .section-card {
+    padding: 1.1rem;
+  }
+
+  .admin-topbar {
+    padding: 0.85rem 1rem;
+  }
+
+  .admin-topbar h2 {
+    font-size: 0.95rem;
+  }
+
+  .btn-preview span {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-card {
+    padding: 0.9rem;
+  }
+
+  .tab-content {
+    padding: 0.75rem;
+  }
+
+  .list-item {
+    padding: 0.85rem;
+  }
+
+  /* Login page mobile */
+  .login-card {
+    padding: 0 0.25rem;
+  }
+
+  .login-card h1 {
+    font-size: 1.5rem;
+  }
+
+  .login-avatar {
+    width: 54px;
+    height: 54px;
+    font-size: 1.5rem;
+  }
 }
