@@ -544,6 +544,62 @@ textarea::placeholder {
   background: rgba(124,58,237,0.15);
 }
 
+/* Topbar logout button (visible on mobile) */
+.btn-topbar-logout {
+  display: none; /* Hidden on desktop — use sidebar logout */
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(239,68,68,0.15);
+  border: 1px solid rgba(239,68,68,0.3);
+  color: #f87171;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-topbar-logout:hover {
+  background: rgba(239,68,68,0.25);
+}
+
+/* Back to top button for admin */
+#admin-back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 100;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #0ea5e9);
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(124,58,237,0.4);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s ease;
+}
+
+#admin-back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+#admin-back-to-top:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(124,58,237,0.6);
+}
+
 /* ===== ADMIN LAYOUT ===== */
 .admin-page {
   display: flex;
@@ -924,6 +980,11 @@ textarea::placeholder {
     margin-left: 0;
     width: 100%;
     overflow-x: hidden;
+  }
+
+  /* Show topbar logout on mobile */
+  .btn-topbar-logout {
+    display: flex;
   }
 
   /* Topbar: hamburger visible, padding lebih kecil */

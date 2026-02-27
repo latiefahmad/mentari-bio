@@ -163,8 +163,12 @@
                 </button>
                 <h2 id="page-title">Hero & Profil</h2>
                 <a href="index.html" target="_blank" class="btn-preview">
-                    <i class="ph-fill ph-eye"></i> Lihat Website
+                    <i class="ph-fill ph-eye"></i> <span>Lihat Website</span>
                 </a>
+                <!-- Logout button di topbar (visible di mobile) -->
+                <button class="btn-topbar-logout" id="topbar-logout-btn" title="Keluar">
+                    <i class="ph-fill ph-sign-out"></i>
+                </button>
             </header>
 
             <!-- Tab: Hero -->
@@ -406,6 +410,11 @@
 
     <!-- Toast -->
     <div id="admin-toast"></div>
+
+    <!-- Back to Top Button -->
+    <button id="admin-back-to-top" aria-label="Kembali ke atas">
+        <i class="ph-fill ph-arrow-up"></i>
+    </button>
 
     <script src="admin.js"></script>
 </body>

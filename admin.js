@@ -152,8 +152,30 @@ document.getElementById("toggle-password").addEventListener("click", () => {
   }
 });
 
-// Logout
+// Logout (sidebar button)
 document.getElementById("logout-btn").addEventListener("click", logout);
+
+// Logout (topbar button - mobile)
+const topbarLogoutBtn = document.getElementById("topbar-logout-btn");
+if (topbarLogoutBtn) {
+  topbarLogoutBtn.addEventListener("click", logout);
+}
+
+// Back to top button
+const adminBackToTop = document.getElementById("admin-back-to-top");
+if (adminBackToTop) {
+  window.addEventListener("scroll", () => {
+    if (window.scrollY > 200) {
+      adminBackToTop.classList.add("visible");
+    } else {
+      adminBackToTop.classList.remove("visible");
+    }
+  });
+
+  adminBackToTop.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
 
 // ===== SIDEBAR NAVIGATION =====
 const navItems = document.querySelectorAll(".nav-item");
