@@ -1,58 +1,322 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rumah Belajar Mentari</title>
     <link rel="icon" href="./img/favicon.png"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 
 <body>
 
-    <!-- Background Animation Text -->
-    <span class="bg-text-animation">Mentari</span>
-
-    <!-- Profile -->
-    <img class="my-photo" src="./img/mentari-bg.jpg" alt="LA Logo">
-    <h1>Rumah Belajar Mentari</h1>
-    <p>"Mari membuat belajar lebih menyenangkan"</p>
-
-    <!-- Link List -->
-    <ul class="links">
-        <li>
-            <a href="https://wa.me/6285733408212" target="_blank" class="link-card">
-                <div class="link-icon">
-                    <i class="ph-fill ph-whatsapp-logo"></i>
-                </div>
-                <p class="link-text">Hubungi Kami</p>
-                <div class="link-action">
-                    <i class="ph-fill ph-arrow-right"></i>
-                </div>
-            </a>
-        </li>
-        <li>
-            <a href="https://instagram.com/rb.mentari" target="_blank" class="link-card">
-                <div class="link-icon">
-                    <i class="ph-fill ph-instagram-logo"></i>
-                </div>
-                <p class="link-text">Instagram Rumah Belajar Mentari</p>
-                <div class="link-action">
-                    <i class="ph-fill ph-arrow-right"></i>
-                </div>
-            </a>
-        </li>
-
-    </ul>
-
-    <div class="copyright">
-        <img src="./img/mentari-mark.png" alt="mentari Logo">
-        <p>Made with 💖 Rumah Belajar Mentari &copy; <script>document.write(new Date().getFullYear())</script></p>
+    <!-- Background Decoration -->
+    <div class="bg-decoration">
+        <div class="bg-blob blob-1"></div>
+        <div class="bg-blob blob-2"></div>
+        <div class="bg-blob blob-3"></div>
     </div>
 
-    <script src="/script.js"></script>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <div class="profile-wrapper">
+                <div class="profile-ring"></div>
+                <img class="my-photo" src="./img/mentari-bg.jpg" alt="Rumah Belajar Mentari">
+                <div class="profile-badge">
+                    <i class="ph-fill ph-star"></i>
+                </div>
+            </div>
+            <div class="hero-text">
+                <div class="hero-tag">
+                    <i class="ph-fill ph-book-open"></i>
+                    <span>Lembaga Bimbingan Belajar</span>
+                </div>
+                <h1>Rumah Belajar <span class="highlight">Mentari</span></h1>
+                <p class="hero-tagline">"Mari membuat belajar lebih menyenangkan"</p>
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Siswa Aktif</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">5+</span>
+                        <span class="stat-label">Tahun Pengalaman</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">10+</span>
+                        <span class="stat-label">Pengajar Berpengalaman</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="section about-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="ph-fill ph-info"></i>
+            </div>
+            <h2>Tentang Kami</h2>
+        </div>
+        <p class="about-text">
+            Rumah Belajar Mentari adalah lembaga bimbingan belajar yang berdedikasi untuk membantu siswa meraih prestasi terbaik mereka. Kami percaya bahwa setiap anak memiliki potensi luar biasa yang perlu dikembangkan dengan cara yang menyenangkan dan efektif.
+        </p>
+        <div class="about-features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="ph-fill ph-chalkboard-teacher"></i>
+                </div>
+                <h3>Pengajar Berpengalaman</h3>
+                <p>Tenaga pengajar profesional dan berpengalaman di bidangnya</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="ph-fill ph-smiley"></i>
+                </div>
+                <h3>Belajar Menyenangkan</h3>
+                <p>Metode pembelajaran interaktif yang membuat siswa semangat belajar</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="ph-fill ph-chart-line-up"></i>
+                </div>
+                <h3>Hasil Terbukti</h3>
+                <p>Ratusan siswa telah meningkatkan prestasi akademik mereka</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Programs Section -->
+    <section class="section programs-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="ph-fill ph-graduation-cap"></i>
+            </div>
+            <h2>Program Belajar</h2>
+        </div>
+        <div class="programs-grid">
+            <div class="program-card">
+                <div class="program-level">SD</div>
+                <h3>Sekolah Dasar</h3>
+                <p>Kelas 1 – 6</p>
+                <ul class="program-subjects">
+                    <li><i class="ph-fill ph-check-circle"></i> Matematika</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Bahasa Indonesia</li>
+                    <li><i class="ph-fill ph-check-circle"></i> IPA & IPS</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Bahasa Inggris</li>
+                </ul>
+            </div>
+            <div class="program-card program-featured">
+                <div class="program-badge">Populer</div>
+                <div class="program-level">SMP</div>
+                <h3>Sekolah Menengah Pertama</h3>
+                <p>Kelas 7 – 9</p>
+                <ul class="program-subjects">
+                    <li><i class="ph-fill ph-check-circle"></i> Matematika</li>
+                    <li><i class="ph-fill ph-check-circle"></i> IPA Terpadu</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Bahasa Inggris</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Persiapan UN</li>
+                </ul>
+            </div>
+            <div class="program-card">
+                <div class="program-level">SMA</div>
+                <h3>Sekolah Menengah Atas</h3>
+                <p>Kelas 10 – 12</p>
+                <ul class="program-subjects">
+                    <li><i class="ph-fill ph-check-circle"></i> Matematika & Fisika</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Kimia & Biologi</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Bahasa Inggris</li>
+                    <li><i class="ph-fill ph-check-circle"></i> Persiapan SNBT</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Schedule Section -->
+    <section class="section schedule-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="ph-fill ph-calendar"></i>
+            </div>
+            <h2>Jadwal Belajar</h2>
+        </div>
+        <div class="schedule-grid">
+            <div class="schedule-card">
+                <div class="schedule-day">Senin – Jumat</div>
+                <div class="schedule-time">
+                    <i class="ph-fill ph-clock"></i>
+                    <span>14.00 – 17.00 WIB</span>
+                </div>
+                <div class="schedule-desc">Sesi Sore (Reguler)</div>
+            </div>
+            <div class="schedule-card">
+                <div class="schedule-day">Sabtu</div>
+                <div class="schedule-time">
+                    <i class="ph-fill ph-clock"></i>
+                    <span>08.00 – 12.00 WIB</span>
+                </div>
+                <div class="schedule-desc">Sesi Pagi (Weekend)</div>
+            </div>
+            <div class="schedule-card">
+                <div class="schedule-day">Fleksibel</div>
+                <div class="schedule-time">
+                    <i class="ph-fill ph-clock"></i>
+                    <span>Sesuai Kesepakatan</span>
+                </div>
+                <div class="schedule-desc">Privat / Online</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section class="section location-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="ph-fill ph-map-pin"></i>
+            </div>
+            <h2>Lokasi Kami</h2>
+        </div>
+        <div class="location-card">
+            <div class="location-icon">
+                <i class="ph-fill ph-map-pin-area"></i>
+            </div>
+            <div class="location-info">
+                <h3>Rumah Belajar Mentari</h3>
+                <p>Jl. Contoh No. 123, Kota Anda</p>
+                <p class="location-note">Hubungi kami untuk informasi lokasi lengkap</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Links Section -->
+    <section class="section links-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="ph-fill ph-link"></i>
+            </div>
+            <h2>Hubungi & Ikuti Kami</h2>
+        </div>
+        <ul class="links">
+            <li>
+                <a href="https://wa.me/6285733408212" target="_blank" class="link-card link-whatsapp">
+                    <div class="link-icon">
+                        <i class="ph-fill ph-whatsapp-logo"></i>
+                    </div>
+                    <div class="link-info">
+                        <p class="link-text">Hubungi via WhatsApp</p>
+                        <p class="link-sub">+62 857-3340-8212</p>
+                    </div>
+                    <div class="link-action">
+                        <i class="ph-fill ph-arrow-right"></i>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="https://instagram.com/rb.mentari" target="_blank" class="link-card link-instagram">
+                    <div class="link-icon">
+                        <i class="ph-fill ph-instagram-logo"></i>
+                    </div>
+                    <div class="link-info">
+                        <p class="link-text">Instagram Kami</p>
+                        <p class="link-sub">@rb.mentari</p>
+                    </div>
+                    <div class="link-action">
+                        <i class="ph-fill ph-arrow-right"></i>
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="#daftar" class="link-card link-daftar" id="daftar-btn">
+                    <div class="link-icon">
+                        <i class="ph-fill ph-pencil-simple"></i>
+                    </div>
+                    <div class="link-info">
+                        <p class="link-text">Daftar Sekarang</p>
+                        <p class="link-sub">Pendaftaran siswa baru</p>
+                    </div>
+                    <div class="link-action">
+                        <i class="ph-fill ph-arrow-right"></i>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Testimonial Section -->
+    <section class="section testimonial-section">
+        <div class="section-header">
+            <div class="section-icon">
+                <i class="ph-fill ph-quotes"></i>
+            </div>
+            <h2>Kata Mereka</h2>
+        </div>
+        <div class="testimonials">
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                </div>
+                <p class="testimonial-text">"Nilai matematika anak saya naik drastis setelah belajar di Rumah Belajar Mentari. Pengajarnya sabar dan metodenya mudah dipahami."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">A</div>
+                    <div>
+                        <p class="author-name">Ibu Ani</p>
+                        <p class="author-role">Orang tua siswa SD</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                    <i class="ph-fill ph-star"></i>
+                </div>
+                <p class="testimonial-text">"Belajar di sini menyenangkan! Saya jadi lebih percaya diri menghadapi ujian. Terima kasih Rumah Belajar Mentari!"</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">B</div>
+                    <div>
+                        <p class="author-name">Budi</p>
+                        <p class="author-role">Siswa SMP Kelas 9</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <img src="./img/mentari-mark.png" alt="Mentari Logo" class="footer-logo">
+        <p class="footer-name">Rumah Belajar Mentari</p>
+        <p class="footer-tagline">"Mari membuat belajar lebih menyenangkan"</p>
+        <div class="footer-socials">
+            <a href="https://wa.me/6285733408212" target="_blank" class="social-btn">
+                <i class="ph-fill ph-whatsapp-logo"></i>
+            </a>
+            <a href="https://instagram.com/rb.mentari" target="_blank" class="social-btn">
+                <i class="ph-fill ph-instagram-logo"></i>
+            </a>
+        </div>
+        <p class="footer-copy">Made with 💖 Rumah Belajar Mentari &copy; <script>document.write(new Date().getFullYear())</script></p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast"></div>
+
+    <script src="script.js"></script>
 </body>
 
 </html>
