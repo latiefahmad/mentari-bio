@@ -612,24 +612,59 @@ h1 {
   transform: translateX(3px);
 }
 
-/* ===== TESTIMONIAL SECTION ===== */
-.testimonials {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+/* ===== TESTIMONIAL SLIDESHOW ===== */
+.testimonial-slideshow {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  width: 100%;
+}
+
+.testimonial-track {
+  display: flex;
+  transition: transform 0.5s ease;
+  will-change: transform;
 }
 
 .testimonial-card {
+  min-width: 100%;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 16px;
-  padding: 1.1rem;
-  transition: all 0.3s ease;
+  padding: 1.5rem;
+  transition: border-color 0.3s ease;
 }
 
 .testimonial-card:hover {
   border-color: rgba(245, 158, 11, 0.3);
-  transform: translateY(-3px);
+}
+
+/* Dot navigation for testimonials */
+.testimonial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.testimonial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.testimonial-dot.active {
+  background: #f59e0b;
+  transform: scale(1.3);
+}
+
+.testimonial-dot:hover {
+  background: rgba(245,158,11,0.6);
 }
 
 .testimonial-stars {
@@ -824,9 +859,6 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .testimonials {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (min-width: 521px) and (max-width: 640px) {

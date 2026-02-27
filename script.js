@@ -244,10 +244,29 @@ function goToSlide(index) {
   dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
 }
 
+// ===== TESTIMONIAL SLIDESHOW =====
+let _testimonialSlideIndex = 0;
+let _testimonialSlideTimer = null;
+const TESTIMONIAL_SLIDE_INTERVAL = 5000;
+
 function renderTestimonials(testimonials) {
-  const container = document.querySelector(".testimonials");
-  if (!container) return;
-  container.innerHTML = testimonials.map(t => `
+  const track = document.getElementById("testimonial-track");
+  const dotsEl = document.getElementById("testimonial-dots");
+  if (!track) return;
+
+  if (_testimonialSlideTimer) {
+    clearInterval(_testimonialSlideTimer);
+    _testimonialSlideTimer = null;
+  }
+
+  if (!testimonials || testimonials.length === 0) {
+    track.innerHTML = "";
+    if (dotsEl) dotsEl.innerHTML = "";
+    return;
+  }
+
+  // Setiap testimoni = 1 slide
+  track.innerHTML = testimonials.map(t => `
     <div class="testimonial-card">
       <div class="testimonial-stars">
         ${Array.from({ length: t.stars || 5 }, () => '<i class="ph-fill ph-star"></i>').join("")}
@@ -261,6 +280,33 @@ function renderTestimonials(testimonials) {
         </div>
       </div>
     </div>`).join("");
+
+  // Render dots
+  if (dotsEl) {
+    dotsEl.innerHTML = testimonials.map((_, i) =>
+      `<button class="testimonial-dot${i === 0 ? " active" : ""}" onclick="goToTestimonial(${i})" aria-label="Testimoni ${i + 1}"></button>`
+    ).join("");
+  }
+
+  _testimonialSlideIndex = 0;
+  goToTestimonial(0);
+
+  if (testimonials.length > 1) {
+    _testimonialSlideTimer = setInterval(() => {
+      _testimonialSlideIndex = (_testimonialSlideIndex + 1) % testimonials.length;
+      goToTestimonial(_testimonialSlideIndex);
+    }, TESTIMONIAL_SLIDE_INTERVAL);
+  }
+}
+
+function goToTestimonial(index) {
+  const track = document.getElementById("testimonial-track");
+  const dots = document.querySelectorAll(".testimonial-dot");
+  if (!track) return;
+
+  _testimonialSlideIndex = index;
+  track.style.transform = `translateX(-${index * 100}%)`;
+  dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
 }
 
 function renderFooter(d) {
