@@ -173,22 +173,74 @@ function renderLinks(d) {
   window._waData = d;
 }
 
+// ===== GALLERY SLIDESHOW =====
+let _gallerySlideIndex = 0;
+let _gallerySlideTimer = null;
+const GALLERY_ITEMS_PER_SLIDE = 2;
+
 function renderGallery(gallery) {
-  const grid = document.getElementById("gallery-grid");
-  if (!grid) return;
+  const track = document.getElementById("gallery-track");
+  const dotsEl = document.getElementById("gallery-dots");
+  if (!track) return;
+
+  // Stop existing timer
+  if (_gallerySlideTimer) {
+    clearInterval(_gallerySlideTimer);
+    _gallerySlideTimer = null;
+  }
 
   const validItems = (gallery || []).filter(g => g.public_url);
 
   if (validItems.length === 0) {
-    grid.innerHTML = `<div class="gallery-empty"><i class="ph ph-images"></i>Belum ada foto galeri</div>`;
+    track.innerHTML = `<div class="gallery-empty" style="min-width:100%;padding:2rem;text-align:center;color:#8787a3;border:1px dashed rgba(255,255,255,0.1);border-radius:16px"><i class="ph ph-images" style="font-size:2rem;display:block;margin-bottom:0.5rem;opacity:0.4"></i>Belum ada foto galeri</div>`;
+    if (dotsEl) dotsEl.innerHTML = "";
     return;
   }
 
-  grid.innerHTML = validItems.map(g => `
-    <div class="gallery-item" onclick="openLightbox('${escHtml(g.public_url)}', '${escHtml(g.caption || "")}')">
-      <img src="${escHtml(g.public_url)}" alt="${escHtml(g.caption || "Galeri Belajar")}" loading="lazy" onerror="this.closest('.gallery-item').style.display='none'">
-      ${g.caption ? `<div class="gallery-item-caption">${escHtml(g.caption)}</div>` : ""}
+  // Bagi gambar menjadi slide, masing-masing 2 gambar
+  const slides = [];
+  for (let i = 0; i < validItems.length; i += GALLERY_ITEMS_PER_SLIDE) {
+    slides.push(validItems.slice(i, i + GALLERY_ITEMS_PER_SLIDE));
+  }
+
+  // Render slides
+  track.innerHTML = slides.map((slideItems) => `
+    <div class="gallery-slide${slideItems.length === 1 ? " single" : ""}">
+      ${slideItems.map(g => `
+        <div class="gallery-item" onclick="openLightbox('${escHtml(g.public_url)}', '${escHtml(g.caption || "")}')">
+          <img src="${escHtml(g.public_url)}" alt="${escHtml(g.caption || "Galeri Belajar")}" loading="lazy" onerror="this.closest('.gallery-item').style.display='none'">
+          ${g.caption ? `<div class="gallery-item-caption">${escHtml(g.caption)}</div>` : ""}
+        </div>`).join("")}
     </div>`).join("");
+
+  // Render dots
+  if (dotsEl) {
+    dotsEl.innerHTML = slides.map((_, i) =>
+      `<button class="gallery-dot${i === 0 ? " active" : ""}" onclick="goToSlide(${i})" aria-label="Slide ${i + 1}"></button>`
+    ).join("");
+  }
+
+  // Reset ke slide pertama
+  _gallerySlideIndex = 0;
+  goToSlide(0);
+
+  // Mulai auto-slide jika lebih dari 1 slide
+  if (slides.length > 1) {
+    _gallerySlideTimer = setInterval(() => {
+      _gallerySlideIndex = (_gallerySlideIndex + 1) % slides.length;
+      goToSlide(_gallerySlideIndex);
+    }, 3000);
+  }
+}
+
+function goToSlide(index) {
+  const track = document.getElementById("gallery-track");
+  const dots = document.querySelectorAll(".gallery-dot");
+  if (!track) return;
+
+  _gallerySlideIndex = index;
+  track.style.transform = `translateX(-${index * 100}%)`;
+  dots.forEach((dot, i) => dot.classList.toggle("active", i === index));
 }
 
 function renderTestimonials(testimonials) {
