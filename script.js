@@ -177,6 +177,7 @@ function renderLinks(d) {
 let _gallerySlideIndex = 0;
 let _gallerySlideTimer = null;
 const GALLERY_ITEMS_PER_SLIDE = 2;
+const GALLERY_SLIDE_INTERVAL = 5000; // 5 detik
 
 function renderGallery(gallery) {
   const track = document.getElementById("gallery-track");
@@ -229,7 +230,7 @@ function renderGallery(gallery) {
     _gallerySlideTimer = setInterval(() => {
       _gallerySlideIndex = (_gallerySlideIndex + 1) % slides.length;
       goToSlide(_gallerySlideIndex);
-    }, 3000);
+    }, GALLERY_SLIDE_INTERVAL);
   }
 }
 
