@@ -243,7 +243,8 @@ h1 {
 
 /* ===== SECTION COMMON ===== */
 .section {
-  padding: 1.5rem 1.25rem;
+  padding: 2rem 1.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .section-header {
@@ -877,10 +878,10 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  /* Section padding */
+  /* Section padding — lebih besar di mobile agar tidak terlalu rapat */
   .section {
-    padding: 0 1rem;
-    margin-bottom: 0.5rem;
+    padding: 1.75rem 1rem;
+    margin-bottom: 0.25rem;
   }
 
   /* Section header */

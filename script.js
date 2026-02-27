@@ -177,7 +177,7 @@ function renderLinks(d) {
 let _gallerySlideIndex = 0;
 let _gallerySlideTimer = null;
 const GALLERY_ITEMS_PER_SLIDE = 2;
-const GALLERY_SLIDE_INTERVAL = 5000; // 5 detik
+const GALLERY_SLIDE_INTERVAL = 7000; // 7 detik
 
 function renderGallery(gallery) {
   const track = document.getElementById("gallery-track");

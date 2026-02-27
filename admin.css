@@ -894,26 +894,74 @@ textarea::placeholder {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
+  /* Sidebar: slide dari kiri */
   .sidebar {
     transform: translateX(-100%);
+    width: 280px;
   }
 
   .sidebar.open {
     transform: translateX(0);
+    box-shadow: 4px 0 20px rgba(0,0,0,0.5);
   }
 
   .sidebar-close {
     display: block;
   }
 
+  /* Main content: full width */
   .admin-main {
     margin-left: 0;
+    width: 100%;
+    overflow-x: hidden;
   }
 
+  /* Topbar: hamburger visible, padding lebih kecil */
   .menu-toggle {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
   }
 
+  .admin-topbar {
+    padding: 0.75rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    gap: 0.75rem;
+  }
+
+  .admin-topbar h2 {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-preview {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.78rem;
+    flex-shrink: 0;
+  }
+
+  /* Tab content */
+  .tab-content {
+    padding: 0.85rem;
+  }
+
+  /* Section card: full width, no overflow */
+  .section-card {
+    padding: 1rem;
+    border-radius: 16px;
+    overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Form grids: single column */
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -926,38 +974,33 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
 
-  .tab-content {
-    padding: 1rem;
-  }
-
-  .section-card {
-    padding: 1.1rem;
-  }
-
-  .admin-topbar {
-    padding: 0.85rem 1rem;
-  }
-
-  .admin-topbar h2 {
-    font-size: 0.95rem;
-  }
-
-  .btn-preview span {
-    display: none;
+  /* Input fields: full width */
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="url"],
+  input[type="number"],
+  textarea {
+    font-size: 16px; /* Prevent iOS zoom on focus */
   }
 }
 
 @media (max-width: 480px) {
   .section-card {
-    padding: 0.9rem;
+    padding: 0.85rem;
+    border-radius: 14px;
   }
 
   .tab-content {
-    padding: 0.75rem;
+    padding: 0.65rem;
   }
 
   .list-item {
-    padding: 0.85rem;
+    padding: 0.8rem;
+  }
+
+  .admin-topbar {
+    padding: 0.65rem 0.75rem;
   }
 
   /* Login page mobile */
