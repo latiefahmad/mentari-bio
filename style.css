@@ -871,11 +871,15 @@ h1 {
   position: relative;
   border-radius: 14px;
   overflow: hidden;
+  /* Fixed aspect ratio — semua gambar sama tingginya */
   aspect-ratio: 4/3;
   background: rgba(255,255,255,0.04);
   border: 1px solid rgba(255,255,255,0.08);
   cursor: pointer;
   transition: border-color 0.3s ease;
+  /* Pastikan tidak ada yang bisa mengubah ukuran */
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .gallery-item:hover {
@@ -883,15 +887,19 @@ h1 {
 }
 
 .gallery-item img {
+  /* Paksa gambar mengisi seluruh container dengan crop tengah */
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   display: block;
   transition: transform 0.4s ease;
 }
 
 .gallery-item:hover img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 .gallery-item-caption {
