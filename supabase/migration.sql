@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS testimonials (
 -- Hash dibuat dengan bcrypt cost 12
 -- Ganti password setelah pertama login!
 INSERT INTO admin_users (username, password_hash)
-VALUES ('admin', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HS.iK8e')
+VALUES ('admin', '$2a$12$jlhNRAebAxGOW9oZEneUg.WuFl3kxLlK6541eYXdG3oqJAXkZP4fy')
 ON CONFLICT (username) DO NOTHING;
 
 -- Konten default
