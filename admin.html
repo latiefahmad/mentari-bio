@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin – Rumah Belajar Mentari</title>
+    <link rel="icon" href="./img/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="admin.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+
+<body>
+
+    <!-- ===== LOGIN PAGE ===== -->
+    <div id="login-page" class="login-page">
+        <div class="login-card">
+            <img src="./img/mentari-mark.png" alt="Logo" class="login-logo">
+            <h1>Admin Panel</h1>
+            <p class="login-subtitle">Rumah Belajar Mentari</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <i class="ph-fill ph-user"></i>
+                        <input type="text" id="username" placeholder="Masukkan username" autocomplete="username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="ph-fill ph-lock"></i>
+                        <input type="password" id="password" placeholder="Masukkan password" autocomplete="current-password">
+                        <button type="button" id="toggle-password" class="toggle-pw">
+                            <i class="ph ph-eye" id="eye-icon"></i>
+                        </button>
+                    </div>
+                </div>
+                <p id="login-error" class="login-error"></p>
+                <button type="submit" class="btn-primary btn-full">
+                    <i class="ph-fill ph-sign-in"></i>
+                    Masuk
+                </button>
+            </form>
+            <a href="index.html" class="back-link">
+                <i class="ph-fill ph-arrow-left"></i> Kembali ke halaman utama
+            </a>
+        </div>
+    </div>
+
+    <!-- ===== ADMIN DASHBOARD ===== -->
+    <div id="admin-page" class="admin-page hidden">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <img src="./img/mentari-mark.png" alt="Logo" class="sidebar-logo">
+                <div>
+                    <p class="sidebar-title">Admin Panel</p>
+                    <p class="sidebar-sub">Rumah Belajar Mentari</p>
+                </div>
+                <button class="sidebar-close" id="sidebar-close">
+                    <i class="ph-fill ph-x"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="hero">
+                    <i class="ph-fill ph-house"></i> Hero & Profil
+                </button>
+                <button class="nav-item" data-tab="about">
+                    <i class="ph-fill ph-info"></i> Tentang Kami
+                </button>
+                <button class="nav-item" data-tab="programs">
+                    <i class="ph-fill ph-graduation-cap"></i> Program Belajar
+                </button>
+                <button class="nav-item" data-tab="schedule">
+                    <i class="ph-fill ph-calendar"></i> Jadwal Belajar
+                </button>
+                <button class="nav-item" data-tab="location">
+                    <i class="ph-fill ph-map-pin"></i> Lokasi
+                </button>
+                <button class="nav-item" data-tab="links">
+                    <i class="ph-fill ph-link"></i> Tautan & Kontak
+                </button>
+                <button class="nav-item" data-tab="gallery">
+                    <i class="ph-fill ph-images"></i> Galeri Belajar
+                </button>
+                <button class="nav-item" data-tab="testimonials">
+                    <i class="ph-fill ph-quotes"></i> Testimoni
+                </button>
+                <button class="nav-item" data-tab="footer">
+                    <i class="ph-fill ph-layout"></i> Footer
+                </button>
+                <button class="nav-item" data-tab="password">
+                    <i class="ph-fill ph-key"></i> Ganti Password
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logout-btn" class="btn-logout">
+                    <i class="ph-fill ph-sign-out"></i> Keluar
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Top Bar -->
+            <header class="admin-topbar">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="ph-fill ph-list"></i>
+                </button>
+                <h2 id="page-title">Hero & Profil</h2>
+                <a href="index.html" target="_blank" class="btn-preview">
+                    <i class="ph-fill ph-eye"></i> Lihat Website
+                </a>
+            </header>
+
+            <!-- Tab: Hero -->
+            <section class="tab-content active" id="tab-hero">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-house"></i> Hero & Profil</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nama Lembaga</label>
+                            <input type="text" id="hero-name" placeholder="Rumah Belajar Mentari">
+                        </div>
+                        <div class="form-group">
+                            <label>Tagline</label>
+                            <input type="text" id="hero-tagline" placeholder='"Mari membuat belajar lebih menyenangkan"'>
+                        </div>
+                        <div class="form-group">
+                            <label>Tag / Label</label>
+                            <input type="text" id="hero-tag" placeholder="Lembaga Bimbingan Belajar">
+                        </div>
+                    </div>
+                    <h4 class="sub-title">Statistik</h4>
+                    <div class="form-grid form-grid-3">
+                        <div class="form-group">
+                            <label>Jumlah Siswa</label>
+                            <input type="text" id="stat-students" placeholder="100+">
+                        </div>
+                        <div class="form-group">
+                            <label>Tahun Pengalaman</label>
+                            <input type="text" id="stat-years" placeholder="5+">
+                        </div>
+                        <div class="form-group">
+                            <label>Jumlah Pengajar</label>
+                            <input type="text" id="stat-teachers" placeholder="10+">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="saveHero()">
+                        <i class="ph-fill ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tab: About -->
+            <section class="tab-content hidden" id="tab-about">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-info"></i> Tentang Kami</h3>
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea id="about-desc" rows="4" placeholder="Deskripsi tentang lembaga..."></textarea>
+                    </div>
+                    <h4 class="sub-title">Fitur Unggulan</h4>
+                    <div id="about-features-list"></div>
+                    <button class="btn-secondary" onclick="addAboutFeature()">
+                        <i class="ph-fill ph-plus"></i> Tambah Fitur
+                    </button>
+                    <div class="action-row">
+                        <button class="btn-primary" onclick="saveAbout()">
+                            <i class="ph-fill ph-floppy-disk"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Programs -->
+            <section class="tab-content hidden" id="tab-programs">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-graduation-cap"></i> Program Belajar</h3>
+                    <div id="programs-list"></div>
+                    <button class="btn-secondary" onclick="addProgram()">
+                        <i class="ph-fill ph-plus"></i> Tambah Program
+                    </button>
+                    <div class="action-row">
+                        <button class="btn-primary" onclick="savePrograms()">
+                            <i class="ph-fill ph-floppy-disk"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Schedule -->
+            <section class="tab-content hidden" id="tab-schedule">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-calendar"></i> Jadwal Belajar</h3>
+                    <div id="schedule-list"></div>
+                    <button class="btn-secondary" onclick="addSchedule()">
+                        <i class="ph-fill ph-plus"></i> Tambah Jadwal
+                    </button>
+                    <div class="action-row">
+                        <button class="btn-primary" onclick="saveSchedule()">
+                            <i class="ph-fill ph-floppy-disk"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Location -->
+            <section class="tab-content hidden" id="tab-location">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-map-pin"></i> Lokasi</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nama Tempat</label>
+                            <input type="text" id="loc-name" placeholder="Rumah Belajar Mentari">
+                        </div>
+                        <div class="form-group">
+                            <label>Alamat</label>
+                            <input type="text" id="loc-address" placeholder="Jl. Contoh No. 123, Kota Anda">
+                        </div>
+                        <div class="form-group">
+                            <label>Catatan</label>
+                            <input type="text" id="loc-note" placeholder="Hubungi kami untuk informasi lokasi lengkap">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="saveLocation()">
+                        <i class="ph-fill ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tab: Links -->
+            <section class="tab-content hidden" id="tab-links">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-link"></i> Tautan & Kontak</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nomor WhatsApp (format: 628xxx)</label>
+                            <input type="text" id="link-wa" placeholder="6285733408212">
+                        </div>
+                        <div class="form-group">
+                            <label>Username Instagram</label>
+                            <input type="text" id="link-ig" placeholder="rb.mentari">
+                        </div>
+                        <div class="form-group">
+                            <label>Pesan Pendaftaran (WhatsApp)</label>
+                            <textarea id="link-wa-msg" rows="3" placeholder="Halo Rumah Belajar Mentari! Saya ingin mendaftar..."></textarea>
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="saveLinks()">
+                        <i class="ph-fill ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tab: Gallery -->
+            <section class="tab-content hidden" id="tab-gallery">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-images"></i> Galeri Belajar</h3>
+                    <p class="card-desc">Tambahkan URL gambar untuk ditampilkan di galeri. Gunakan link gambar dari Google Drive, Imgur, atau hosting gambar lainnya.</p>
+                    <div id="gallery-list"></div>
+                    <button class="btn-secondary" onclick="addGalleryItem()">
+                        <i class="ph-fill ph-plus"></i> Tambah Gambar
+                    </button>
+                    <div class="action-row">
+                        <button class="btn-primary" onclick="saveGallery()">
+                            <i class="ph-fill ph-floppy-disk"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Testimonials -->
+            <section class="tab-content hidden" id="tab-testimonials">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-quotes"></i> Testimoni</h3>
+                    <div id="testimonials-list"></div>
+                    <button class="btn-secondary" onclick="addTestimonial()">
+                        <i class="ph-fill ph-plus"></i> Tambah Testimoni
+                    </button>
+                    <div class="action-row">
+                        <button class="btn-primary" onclick="saveTestimonials()">
+                            <i class="ph-fill ph-floppy-disk"></i> Simpan
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Footer -->
+            <section class="tab-content hidden" id="tab-footer">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-layout"></i> Footer</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nama di Footer</label>
+                            <input type="text" id="footer-name" placeholder="Rumah Belajar Mentari">
+                        </div>
+                        <div class="form-group">
+                            <label>Tagline Footer</label>
+                            <input type="text" id="footer-tagline" placeholder='"Mari membuat belajar lebih menyenangkan"'>
+                        </div>
+                        <div class="form-group">
+                            <label>Teks Copyright</label>
+                            <input type="text" id="footer-copy" placeholder="Made with 💖 Rumah Belajar Mentari">
+                        </div>
+                    </div>
+                    <button class="btn-primary" onclick="saveFooter()">
+                        <i class="ph-fill ph-floppy-disk"></i> Simpan
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tab: Password -->
+            <section class="tab-content hidden" id="tab-password">
+                <div class="section-card">
+                    <h3 class="card-title"><i class="ph-fill ph-key"></i> Ganti Password</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Password Lama</label>
+                            <input type="password" id="old-password" placeholder="Password saat ini">
+                        </div>
+                        <div class="form-group">
+                            <label>Password Baru</label>
+                            <input type="password" id="new-password" placeholder="Password baru">
+                        </div>
+                        <div class="form-group">
+                            <label>Konfirmasi Password Baru</label>
+                            <input type="password" id="confirm-password" placeholder="Ulangi password baru">
+                        </div>
+                    </div>
+                    <p id="pw-msg" class="pw-msg"></p>
+                    <button class="btn-primary" onclick="changePassword()">
+                        <i class="ph-fill ph-floppy-disk"></i> Ganti Password
+                    </button>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="admin-toast"></div>
+
+    <script src="admin.js"></script>
+</body>
+
+</html>
