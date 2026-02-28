@@ -756,7 +756,7 @@ textarea::placeholder {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  overflow: hidden;
+  overflow: visible; /* Jangan hidden — bisa memblokir klik pada tombol */
   width: 100%;
   box-sizing: border-box;
 }
@@ -1023,11 +1023,11 @@ textarea::placeholder {
     padding: 0.85rem;
   }
 
-  /* Section card: full width, no overflow */
+  /* Section card: full width */
   .section-card {
     padding: 1rem;
     border-radius: 16px;
-    overflow: hidden;
+    overflow: visible;
     width: 100%;
     box-sizing: border-box;
   }
