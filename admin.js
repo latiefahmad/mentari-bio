@@ -232,6 +232,8 @@ async function initAdminPage() {
     loadGallery(gallery || []);
     loadTestimonials(data.testimonials || []);
     loadFooter(data.footer || {});
+    // Load events (tidak block jika gagal)
+    loadEvents().catch(() => {});
   } catch (err) {
     showToast("Gagal memuat data: " + err.message, "error");
   }
@@ -822,6 +824,227 @@ async function changePassword() {
   } catch (err) {
     msgEl.textContent = err.message;
     msgEl.className = "pw-msg error";
+  }
+}
+
+// ===========================
+// ===== EVENTS / PROGRAM LAIN =====
+// ===========================
+let _events = [];
+
+async function loadEvents() {
+  try {
+    const data = await apiGet("/api/events");
+    _events = data || [];
+    renderEventsAdmin();
+  } catch (err) {
+    showToast("Gagal memuat events: " + err.message, "error");
+  }
+}
+
+function renderEventsAdmin() {
+  const container = document.getElementById("events-admin-list");
+  if (!container) return;
+
+  if (_events.length === 0) {
+    container.innerHTML = `<p style="color:#8787a3;font-size:0.85rem;padding:1rem 0">Belum ada acara. Buat acara baru di atas.</p>`;
+    return;
+  }
+
+  container.innerHTML = _events.map((event, i) => {
+    const photos = event.event_photos || [];
+    const dateStr = event.event_date
+      ? new Date(event.event_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+      : "Tanggal tidak diset";
+
+    return `
+      <div class="list-item" id="event-item-${event.id}">
+        <div class="list-item-header">
+          <div>
+            <span class="list-item-title">${escHtml(event.title)}</span>
+            ${event.category ? `<span style="margin-left:0.5rem;font-size:0.72rem;color:#a78bfa;background:rgba(124,58,237,0.15);padding:0.15rem 0.5rem;border-radius:10px">${escHtml(event.category)}</span>` : ""}
+            <br><span style="font-size:0.72rem;color:#8787a3">${dateStr} • ${photos.length} foto • ${event.is_published ? "✅ Ditampilkan" : "🔒 Disembunyikan"}</span>
+          </div>
+          <button class="btn-danger" onclick="deleteEvent('${event.id}')">
+            <i class="ph-fill ph-trash"></i> Hapus
+          </button>
+        </div>
+
+        <!-- Edit form -->
+        <div class="list-item-grid">
+          <div class="form-group">
+            <label>Nama Acara</label>
+            <input type="text" id="ev-title-${event.id}" value="${escHtml(event.title)}">
+          </div>
+          <div class="form-group">
+            <label>Kategori</label>
+            <input type="text" id="ev-cat-${event.id}" value="${escHtml(event.category || "")}">
+          </div>
+          <div class="form-group">
+            <label>Tanggal</label>
+            <input type="date" id="ev-date-${event.id}" value="${event.event_date || ""}">
+          </div>
+          <div class="form-group" style="display:flex;align-items:center;gap:0.5rem;padding-top:1.5rem">
+            <input type="checkbox" id="ev-pub-${event.id}" ${event.is_published ? "checked" : ""} style="width:auto">
+            <label for="ev-pub-${event.id}" style="margin:0">Tampilkan</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Deskripsi</label>
+          <textarea id="ev-desc-${event.id}" rows="2">${escHtml(event.description || "")}</textarea>
+        </div>
+        <button class="btn-secondary" style="align-self:flex-start" onclick="updateEvent('${event.id}')">
+          <i class="ph-fill ph-floppy-disk"></i> Simpan Perubahan
+        </button>
+
+        <!-- Upload foto -->
+        <div class="sub-title" style="margin-top:0.5rem">Foto Acara (${photos.length})</div>
+        <div class="upload-area" style="padding:1rem" onclick="document.getElementById('ev-file-${event.id}').click()">
+          <i class="ph ph-upload-simple" style="font-size:1.5rem"></i>
+          <p style="font-size:0.82rem">Klik untuk upload foto</p>
+        </div>
+        <input type="file" id="ev-file-${event.id}" accept="image/*" multiple style="display:none"
+          onchange="uploadEventPhotos('${event.id}', this)">
+        <div class="form-group">
+          <label>Keterangan foto (opsional)</label>
+          <input type="text" id="ev-photo-caption-${event.id}" placeholder="Keterangan untuk foto yang diupload...">
+        </div>
+
+        <!-- Daftar foto -->
+        <div id="ev-photos-${event.id}" style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-top:0.5rem">
+          ${photos.map(p => `
+            <div style="position:relative;border-radius:10px;overflow:hidden;aspect-ratio:4/3;background:rgba(255,255,255,0.04)">
+              <img src="${escHtml(p.public_url)}" style="width:100%;height:100%;object-fit:cover" alt="">
+              <button onclick="deleteEventPhoto('${p.id}', '${event.id}')"
+                style="position:absolute;top:0.3rem;right:0.3rem;background:rgba(239,68,68,0.8);border:none;color:white;border-radius:6px;padding:0.2rem 0.4rem;font-size:0.7rem;cursor:pointer">
+                <i class="ph-fill ph-trash"></i>
+              </button>
+              ${p.caption ? `<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:white;font-size:0.65rem;padding:0.3rem 0.4rem">${escHtml(p.caption)}</div>` : ""}
+            </div>`).join("")}
+        </div>
+      </div>`;
+  }).join("");
+}
+
+async function createEvent() {
+  const title = document.getElementById("new-event-title")?.value?.trim();
+  if (!title) {
+    showToast("Nama acara wajib diisi", "error");
+    return;
+  }
+
+  try {
+    const data = await fetch("/api/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({
+        title,
+        description: document.getElementById("new-event-desc")?.value || "",
+        event_date: document.getElementById("new-event-date")?.value || null,
+        category: document.getElementById("new-event-category")?.value || "",
+        is_published: document.getElementById("new-event-published")?.checked !== false,
+      }),
+    }).then(r => r.json());
+
+    if (data.error) throw new Error(data.error);
+
+    // Reset form
+    document.getElementById("new-event-title").value = "";
+    document.getElementById("new-event-desc").value = "";
+    document.getElementById("new-event-date").value = "";
+    document.getElementById("new-event-category").value = "";
+
+    // Reload events
+    await loadEvents();
+    showToast("Acara berhasil dibuat!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function updateEvent(eventId) {
+  try {
+    const res = await fetch(`/api/events/${eventId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
+      body: JSON.stringify({
+        title: document.getElementById(`ev-title-${eventId}`)?.value,
+        description: document.getElementById(`ev-desc-${eventId}`)?.value,
+        event_date: document.getElementById(`ev-date-${eventId}`)?.value || null,
+        category: document.getElementById(`ev-cat-${eventId}`)?.value,
+        is_published: document.getElementById(`ev-pub-${eventId}`)?.checked,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    await loadEvents();
+    showToast("Acara berhasil diperbarui!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function deleteEvent(eventId) {
+  if (!confirm("Hapus acara ini beserta semua fotonya?")) return;
+  try {
+    const res = await fetch(`/api/events/${eventId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    await loadEvents();
+    showToast("Acara berhasil dihapus!");
+  } catch (err) {
+    showToast(err.message, "error");
+  }
+}
+
+async function uploadEventPhotos(eventId, input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+
+  const caption = document.getElementById(`ev-photo-caption-${eventId}`)?.value || "";
+
+  for (const file of files) {
+    const formData = new FormData();
+    formData.append("file", file);
+    if (caption) formData.append("caption", caption);
+
+    try {
+      const res = await fetch(`/api/events/photos?event_id=${eventId}`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      showToast("Foto berhasil diupload!");
+    } catch (err) {
+      showToast("Gagal upload: " + err.message, "error");
+    }
+  }
+
+  input.value = "";
+  await loadEvents();
+}
+
+async function deleteEventPhoto(photoId, eventId) {
+  if (!confirm("Hapus foto ini?")) return;
+  try {
+    const res = await fetch(`/api/events/photos?photo_id=${photoId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error);
+
+    await loadEvents();
+    showToast("Foto berhasil dihapus!");
+  } catch (err) {
+    showToast(err.message, "error");
   }
 }
 

@@ -54,13 +54,15 @@ function escHtml(str) {
 // ===== FETCH DATA FROM API =====
 async function fetchAllData() {
   try {
-    const [contentRes, galleryRes] = await Promise.all([
+    const [contentRes, galleryRes, eventsRes] = await Promise.all([
       fetch("/api/content"),
       fetch("/api/gallery"),
+      fetch("/api/events"),
     ]);
 
     const content = contentRes.ok ? await contentRes.json() : {};
     const gallery = galleryRes.ok ? await galleryRes.json() : [];
+    const events = eventsRes.ok ? await eventsRes.json() : [];
 
     return {
       hero: content.hero || DEFAULT_DATA.hero,
@@ -72,10 +74,11 @@ async function fetchAllData() {
       testimonials: content.testimonials?.length ? content.testimonials : DEFAULT_DATA.testimonials,
       footer: content.footer || DEFAULT_DATA.footer,
       gallery: gallery || [],
+      events: events || [],
     };
   } catch (err) {
     console.warn("API tidak tersedia, menggunakan data default:", err);
-    return { ...DEFAULT_DATA, gallery: [] };
+    return { ...DEFAULT_DATA, gallery: [], events: [] };
   }
 }
 
@@ -407,6 +410,52 @@ function showToast(message) {
   }, 2000);
 }
 
+// ===== RENDER EVENTS =====
+function renderEvents(events) {
+  const container = document.getElementById("events-list");
+  const section = document.getElementById("events-section");
+  if (!container) return;
+
+  if (!events || events.length === 0) {
+    // Sembunyikan section jika tidak ada event
+    if (section) section.style.display = "none";
+    return;
+  }
+
+  if (section) section.style.display = "";
+
+  container.innerHTML = events.map(event => {
+    const photos = event.event_photos || [];
+    const dateStr = event.event_date
+      ? new Date(event.event_date).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+      : null;
+
+    return `
+      <div class="event-card">
+        <div class="event-card-header">
+          <div class="event-card-top">
+            <h3 class="event-title">${escHtml(event.title)}</h3>
+            ${event.category ? `<span class="event-badge">${escHtml(event.category)}</span>` : ""}
+          </div>
+          ${dateStr ? `
+            <div class="event-meta">
+              <i class="ph-fill ph-calendar-blank"></i>
+              <span>${dateStr}</span>
+            </div>` : ""}
+          ${event.description ? `<p class="event-description">${escHtml(event.description)}</p>` : ""}
+        </div>
+        ${photos.length > 0 ? `
+          <div class="event-photos">
+            ${photos.map(p => `
+              <div class="event-photo-item" onclick="openLightbox('${escHtml(p.public_url)}', '${escHtml(p.caption || event.title)}')">
+                <img src="${escHtml(p.public_url)}" alt="${escHtml(p.caption || event.title)}" loading="lazy" onerror="this.closest('.event-photo-item').style.display='none'">
+                ${p.caption ? `<div class="event-photo-caption">${escHtml(p.caption)}</div>` : ""}
+              </div>`).join("")}
+          </div>` : `<div class="event-empty"><i class="ph ph-image"></i> Belum ada foto</div>`}
+      </div>`;
+  }).join("");
+}
+
 // ===== INIT =====
 fetchAllData().then((data) => {
   renderHero(data.hero);
@@ -417,5 +466,6 @@ fetchAllData().then((data) => {
   renderLinks(data.links);
   renderGallery(data.gallery);
   renderTestimonials(data.testimonials);
+  renderEvents(data.events);
   renderFooter(data.footer);
 });
