@@ -838,9 +838,19 @@ async function loadEvents() {
     _events = data || [];
     renderEventsAdmin();
   } catch (err) {
-    showToast("Gagal memuat events: " + err.message, "error");
+    // Jika tabel belum ada atau error lain, tampilkan pesan kosong
+    const container = document.getElementById("events-admin-list");
+    if (container) container.innerHTML = `<p style="color:#8787a3;font-size:0.85rem;padding:1rem 0">Belum ada acara. Buat acara baru di atas.</p>`;
   }
 }
+
+// Pasang event listener untuk tombol Buat Acara
+document.addEventListener("DOMContentLoaded", () => {
+  const createBtn = document.getElementById("create-event-btn");
+  if (createBtn) {
+    createBtn.addEventListener("click", createEvent);
+  }
+});
 
 function renderEventsAdmin() {
   const container = document.getElementById("events-admin-list");
